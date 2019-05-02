@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 from serial import Serial
-import numpy as np
+from time import sleep
 
 #'/dev/ttyACM0'
 
@@ -32,3 +32,23 @@ def send_pump_cmd(pump_cmd,serialComm):
 #    print(worked)
 #    while True:
 #        print(get_pump_state(ser))
+
+#more testing!
+
+
+#these numbers are a good starting point. suck_time should be for however long we are moving for
+blow_sec=1
+suck_sec=6
+hold_sec=.5
+ser=start_serial("/dev/cu.usbmodem1421")
+sleep(5) #waits for arduino to reset
+#print("here")
+send_pump_cmd(2,ser)
+sleep(blow_sec)
+send_pump_cmd(3,ser)
+sleep(hold_sec)
+send_pump_cmd(1,ser)
+sleep(suck_sec)
+send_pump_cmd(2,ser)
+sleep(blow_sec)
+send_pump_cmd(3,ser)
