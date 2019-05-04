@@ -27,12 +27,29 @@ ok: here are the specific functions that we need and progress on them:
 capture_image() - needs to capture an image from the camera. should output a numpy array of an image. this could be in a separate file and imported
 get_all_toppings(image) - returns locations of toppings. input is numpy array image. currently under construction in color_code.py
 get_pizza(image) - returns locations of holes on pizza and location of pizza. will be in color_code.py and will have to be imported
+camera_to_robot(items) - returns transformed locations of items by applying rotation matrix and translation to transfrom coordinate frame from camera to robot
 hole_selector(toppings,pizza) - returns location of specific hole we want to place a topping into based on which holes are full. if all of the holes are full then we should stop putting toppings on and move on
 topping_selector(toppings,pizza) - returns location of the specific topping we want to pick up. based on location to other toppings and to the pizza
 #not sure after this about path planning what needs to happen. will discuss with other people.
 '''
 
 def add_toppings():
+    '''
+
+    '''
+    while True:
+        '''
+        img=capture_image() #also moves arms out of the way?
+        toppings=get_all_toppings(image)
+        pizza=get_pizza(image)
+        toppings=camera_to_robot(toppings)
+        pizza=camera_to_robot(pizza)
+        hole=hole_selector(toppings,pizza)
+        if !hole:
+            break #break out of the while loop
+        topping=topping_selector(toppings,pizza)
+        #now we plan movement and move and pickup and drop off
+        '''
     return()
 
 def add_shaker():
