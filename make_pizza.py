@@ -39,7 +39,7 @@ def add_toppings():
     '''
     while True:
         '''
-        img=capture_image() #also moves arms out of the way?
+        image=capture_image() #also moves arms out of the way?
         toppings=get_all_toppings(image)
         pizza=get_pizza(image)
         toppings=camera_to_robot(toppings)
@@ -53,6 +53,14 @@ def add_toppings():
     return()
 
 def add_shaker():
+    '''
+        image=capture_image()
+        shaker=get_shaker(image)
+        pizza=get_pizza(image)
+        shaker=camera_to_robot(shaker)
+        pizza=camera_to_robot(pizza)
+        #plan movement and move and pickup shaker and shake()
+    '''
     return()
 
 
