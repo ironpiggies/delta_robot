@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+import numpy as np
+
 #ok this will be main code that will be referenced for main.py in terms of making the pizza
 '''
 here is what needs to happen:
@@ -65,6 +67,8 @@ def add_shaker():
 
 
 def hole_selector(toppings,pizza):
+    #for hole in pizza["holes"]:
+        #continue
     '''
     returns specific location of hole that we want to put topping into.
     if all holes are taken, return false to allow us to exit out of the while loop.
@@ -74,9 +78,22 @@ def hole_selector(toppings,pizza):
     return()
 
 def topping_selector(toppings,pizza):
+    for topping in toppings:
+        continue
     '''
     returns specific location of a topping we want to pick up. should be some
     minimum radius from other toppings as well as minimum radius from the pizza
     so we don't move the pizza or pick up two toppings
     '''
     return()
+
+def camera_to_robot(position):
+    '''
+    takes a 3x1 position vector and outputs a position relative to the robots frame
+    '''
+    rotate=np.array([[-1,0,0],[0,-1,0],[0,0,1]]) #180 degree rotation about x
+    translate=np.array([[-265],[0],[0]]) #26.5 cenitmeters in negative x
+    print(rotate)
+    print(translate)
+    out=np.add(np.dot(rotate,position),translate)
+    return (out)
