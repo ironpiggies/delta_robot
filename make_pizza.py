@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from selector_help import get_dist_list
+from selector_help import get_dist_list, get_center_dist
 
 #ok this will be main code that will be referenced for main.py in terms of making the pizza
 '''
@@ -67,37 +67,24 @@ def add_shaker():
     '''
     return()
 
-
-def hole_selector(toppings,pizza):
-    #for hole in pizza["holes"]:
-        #continue
+def topping_and_hole_selector(toppings,pizza):
     '''
-    returns specific location of hole that we want to put topping into.
-    if all holes are taken, return false to allow us to exit out of the while loop.
-    check if toppings' x,y position is on or near holes' x,y (or in pizza radius of pizza center)
-    to check if the toppings are in the holes. then select a hole that are not filled and return its x,y coordinates
+    returns topping and hole so that we can add to the pizza
     '''
-    return()
 
-def topping_selector(toppings,pizza):
-
-    topping_dist_threshold=50 #minimum distance in mm that we allow
-    pizza_dist_threshold=50
 
     good_topping=False #the topping we want to pick up
+    good_hole=False
+    avail_toppings,avail_holes=get_available_holes_toppings(toppings,pizza)
 
-    for topping in toppings:
-        dist_list=get_dist_list(topping,toppings)
-        if min(dist_list)<=topping_dist_threshold:
-            continue
-        else
+    #for now, just select the first available topping and the first available hole
+    try:
+        good_topping=avail_toppings[0]
+        good_hole=avail_holes[0]
+    except: #if holes are filled, avail_holes=[], if no toppings,avail_toppings=[] so this deals with that
+        print("No more good toppings or holes!")
 
-    '''
-    returns specific location of a topping we want to pick up. should be some
-    minimum radius from other toppings as well as minimum radius from the pizza
-    so we don't move the pizza or pick up two toppings
-    '''
-    return(good_topping)
+    return(good_topping,good_hole)
 
 def camera_to_robot(position):
     '''
@@ -112,6 +99,8 @@ def camera_to_robot(position):
 
 def toppings_converter(items_dict): #im lazy so instead of rewriting everything ill just convert from jay's item output to the one i want :P
     topping_list=[]
+    hole_list=[]
+    pizza={}
     for pep in items_dict['red_circles']: #exact key might change
         topping={
         "name":"pepperoni",
@@ -143,3 +132,70 @@ def toppings_converter(items_dict): #im lazy so instead of rewriting everything 
         "y":oli[1],
         "z":oli[2],
         }
+        topping_list.append(topping)
+    for anch in items_dict('blue_fish'):
+        topping={
+        "name":"anchovy",
+        "x":anch[0],
+        "y":anch[1],
+        "z":anch[2],
+        }
+        topping_list.append(topping)
+    for hole in items_dict('holes'):
+        temp_hole={
+        "name":"hole",
+        "x":hole[0],
+        "y":hole[1],
+        "z":hole[2],
+        }
+        hole_list.append(temp_hole)
+    pizza=items_dict["pizza"]
+    pizza["holes"]=hole_list #should have x,y,z coordinates and radius
+    return topping_list,pizza
+
+def get_available_holes_toppings(toppings,pizza):
+    '''
+    returns a different output_pizza that has a list of the types of toppings
+    it can pick up and the holes that can accept them
+
+    this is based on what toppings are already on the pizza too
+
+    will make selection a lot easier
+    '''
+    hole_radius= 50#in mm
+
+    pizza_offset=50#in mm
+    pizza_radius=float(pizza["radius"])+pizza_offset #distance from center of pizza
+
+    topping_radius=50#in mm, min distance between two toppings
+
+    toppings_on_pizza=[]
+    holes_filled=[]
+
+    toppings_open=[]
+    holes_open=[]
+
+    for topping in toppings:
+        for hole in pizza["holes"]:
+            if (get_center_dist(topping,hole)<hole_radius): #topping is in a hole
+                holes_filled.append(hole)
+                toppings_on_pizza.append(topping["name"])
+
+    for topping in toppings:
+        if (get_center_dist(topping,pizza)>pizza_radius):   #if topping is outside of pizza
+            if min(get_dist_list(topping,toppings))>topping_radius: #if topping is far enough away from other toppings
+                if len(toppings_on_pizza)<5: #if not all types of toppings are on yet. I think there are 5 diff types of toppings
+
+                    if (topping["name"] not in toppings_on_pizza): #avoid toppings we have already added
+                        toppings_open.append(topping)
+                        print("A "+topping["name"]+ "is available for pickup at ("+topping["x"]+","+topping["y"]+")") #prints topping name and location
+                else:
+                    toppings_open.append(topping) #if all toppings are on, then all toppings are available to put on
+
+    for hole in pizza["holes"]: #now add holes that aren't in holed_filled
+        if (hole not in holes_filled):
+            holes_open.append(hole)
+
+    print("Toppings on pizza: "+toppings_on_pizza) #sanity check
+
+    return toppings_open,holes_open
