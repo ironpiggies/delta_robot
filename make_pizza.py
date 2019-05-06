@@ -39,22 +39,21 @@ topping_selector(toppings,pizza) - returns location of the specific topping we w
 
 def add_toppings():
     '''
-
+    continues to add toppings
     '''
-    #while True:
-        '''
-        image=capture_image() #also moves arms out of the way?
-        toppings=get_all_toppings(image)
-        pizza=get_pizza(image)
-        toppings=camera_to_robot(toppings)
-        pizza=camera_to_robot(pizza)
-        hole=hole_selector(toppings,pizza)
-        if !hole:
-            break #break out of the while loop
-        topping=topping_selector(toppings,pizza)
-        #now we plan movement and move and pickup and drop off
-        '''
-    return()
+    num_waypoints=20 #relevant if position control
+    while True:
+        items_dict={} #from jays code we get a dict of all the objects
+        toppings,pizza=toppings_converter(items_dict)
+        topping,hole=topping_and_hole_selector(toppings,pizza)
+        if (topping and hole): #if we have a hole and topping selected
+
+            path=plan_path(topping,hole)
+
+        else:
+            print("Endind add_toppings() because no more holes or no more toppings")
+            return()
+
 
 def add_shaker():
     '''
