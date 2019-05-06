@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from selector_help import get_dist_list, get_center_dist
+from selector_help import get_dist_list, get_center_dist, get_available_holes_toppings
 
 #ok this will be main code that will be referenced for main.py in terms of making the pizza
 '''
@@ -71,7 +71,6 @@ def topping_and_hole_selector(toppings,pizza):
     '''
     returns topping and hole so that we can add to the pizza
     '''
-
 
     good_topping=False #the topping we want to pick up
     good_hole=False
@@ -152,50 +151,3 @@ def toppings_converter(items_dict): #im lazy so instead of rewriting everything 
     pizza=items_dict["pizza"]
     pizza["holes"]=hole_list #should have x,y,z coordinates and radius
     return topping_list,pizza
-
-def get_available_holes_toppings(toppings,pizza):
-    '''
-    returns a different output_pizza that has a list of the types of toppings
-    it can pick up and the holes that can accept them
-
-    this is based on what toppings are already on the pizza too
-
-    will make selection a lot easier
-    '''
-    hole_radius= 50#in mm
-
-    pizza_offset=50#in mm
-    pizza_radius=float(pizza["radius"])+pizza_offset #distance from center of pizza
-
-    topping_radius=50#in mm, min distance between two toppings
-
-    toppings_on_pizza=[]
-    holes_filled=[]
-
-    toppings_open=[]
-    holes_open=[]
-
-    for topping in toppings:
-        for hole in pizza["holes"]:
-            if (get_center_dist(topping,hole)<hole_radius): #topping is in a hole
-                holes_filled.append(hole)
-                toppings_on_pizza.append(topping["name"])
-
-    for topping in toppings:
-        if (get_center_dist(topping,pizza)>pizza_radius):   #if topping is outside of pizza
-            if min(get_dist_list(topping,toppings))>topping_radius: #if topping is far enough away from other toppings
-                if len(toppings_on_pizza)<5: #if not all types of toppings are on yet. I think there are 5 diff types of toppings
-
-                    if (topping["name"] not in toppings_on_pizza): #avoid toppings we have already added
-                        toppings_open.append(topping)
-                        print("A "+topping["name"]+ "is available for pickup at ("+topping["x"]+","+topping["y"]+")") #prints topping name and location
-                else:
-                    toppings_open.append(topping) #if all toppings are on, then all toppings are available to put on
-
-    for hole in pizza["holes"]: #now add holes that aren't in holed_filled
-        if (hole not in holes_filled):
-            holes_open.append(hole)
-
-    print("Toppings on pizza: "+toppings_on_pizza) #sanity check
-
-    return toppings_open,holes_open
