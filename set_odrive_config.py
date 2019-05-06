@@ -19,9 +19,9 @@ Out[5]: 0.0002492110070306808
 
 01 Motor Motor0 (axis2)
 In [37]: odrv1.axis0.motor.config.phase_resistance
-Out[37]: 0.3220207095146179
+Out[37]: 0.321752101183
 In [38]: odrv1.axis0.motor.config.phase_inductance
-Out[38]: 0.0002177459973609075
+Out[38]:  0.000218976492761
 
 
 '''
@@ -30,9 +30,12 @@ from odrive.enums import *
 
 import time
 
+#2084378A3548
 
+#old
+#usb_serials = ['2087377B3548','2084377A3548']
 
-usb_serials = ['2087377B3548','2084377A3548']
+usb_serials = ['2087377B3548','2084378A3548']
 odrvs = [None,None]
 axes = [None, None, None]
 axis0 = None
@@ -62,10 +65,13 @@ odrvs[0].config.brake_resistance = 0
 axis0.controller.config.vel_limit = 200000
 axis0.controller.config.pos_gain = 250
 axis0.controller.config.vel_gain = 0.000005
+axis0.controller.config.vel_integrator_gain = 0
 axis0.motor.config.calibration_current = 4
 axis0.motor.config.current_lim = 5.0
 axis0.motor.config.pole_pairs = 4
 axis0.motor.config.motor_type = MOTOR_TYPE_HIGH_CURRENT
+axis0.motor.config.phase_resistance = 0.3386945426464081
+axis0.motor.config.phase_inductance = 0.00023896312632132322
 axis0.motor.config.pre_calibrated = True
 axis0.encoder.config.cpr = 4000
 axis0.encoder.config.use_index= True
@@ -83,10 +89,13 @@ print "cnfiguring axis1"
 axis1.controller.config.vel_limit = 200000
 axis1.controller.config.pos_gain = 250
 axis1.controller.config.vel_gain = 0.000005
+axis1.controller.config.vel_integrator_gain = 0
 axis1.motor.config.calibration_current = 4
 axis1.motor.config.current_lim = 5.0
 axis1.motor.config.pole_pairs = 4
 axis1.motor.config.motor_type = MOTOR_TYPE_HIGH_CURRENT
+axis1.motor.config.phase_resistance = 0.3414915204048157
+axis1.motor.config.phase_inductance = 0.0002492110070306808
 axis1.motor.config.pre_calibrated = True
 axis1.encoder.config.cpr = 4000
 axis1.encoder.config.use_index= True
@@ -108,10 +117,13 @@ odrvs[1].config.brake_resistance = 0
 axis2.controller.config.vel_limit = 200000
 axis2.controller.config.pos_gain = 250
 axis2.controller.config.vel_gain = 0.000005
+axis2.controller.config.vel_integrator_gain = 0
 axis2.motor.config.calibration_current = 4
 axis2.motor.config.current_lim = 5.0
 axis2.motor.config.pole_pairs = 4
 axis2.motor.config.motor_type = MOTOR_TYPE_HIGH_CURRENT
+axis2.motor.config.phase_resistance = 0.321752101183
+axis2.motor.config.phase_inductance =   0.000218976492761
 axis2.motor.config.pre_calibrated = True
 axis2.encoder.config.cpr = 4000
 axis2.encoder.config.use_index= True
