@@ -2,6 +2,8 @@
 
 import numpy as np
 
+from selector_help import get_dist_list
+
 #ok this will be main code that will be referenced for main.py in terms of making the pizza
 '''
 here is what needs to happen:
@@ -39,7 +41,7 @@ def add_toppings():
     '''
 
     '''
-    while True:
+    #while True:
         '''
         image=capture_image() #also moves arms out of the way?
         toppings=get_all_toppings(image)
@@ -78,14 +80,24 @@ def hole_selector(toppings,pizza):
     return()
 
 def topping_selector(toppings,pizza):
+
+    topping_dist_threshold=50 #minimum distance in mm that we allow
+    pizza_dist_threshold=50
+
+    good_topping=False #the topping we want to pick up
+
     for topping in toppings:
-        continue
+        dist_list=get_dist_list(topping,toppings)
+        if min(dist_list)<=topping_dist_threshold:
+            continue
+        else
+
     '''
     returns specific location of a topping we want to pick up. should be some
     minimum radius from other toppings as well as minimum radius from the pizza
     so we don't move the pizza or pick up two toppings
     '''
-    return()
+    return(good_topping)
 
 def camera_to_robot(position):
     '''
@@ -97,3 +109,37 @@ def camera_to_robot(position):
     print(translate)
     out=np.add(np.dot(rotate,position),translate)
     return (out)
+
+def toppings_converter(items_dict): #im lazy so instead of rewriting everything ill just convert from jay's item output to the one i want :P
+    topping_list=[]
+    for pep in items_dict['red_circles']: #exact key might change
+        topping={
+        "name":"pepperoni",
+        "x":pep[0],
+        "y":pep[1],
+        "z":pep[2],
+        }
+        topping_list.append(topping)
+    for ham in items_dict['pink_squares']: #exact key might change
+        topping={
+        "name":"ham",
+        "x":ham[0],
+        "y":ham[1],
+        "z":ham[2],
+        }
+        topping_list.append(topping)
+    for pine in items_dict('yellow_triangles'):
+        topping={
+        "name":"pineapple",
+        "x":pine[0],
+        "y":pine[1],
+        "z":pine[2],
+        }
+        topping_list.append(topping)
+    for oli in items_dict('black_rings'):
+        topping={
+        "name":"olive",
+        "x":oli[0],
+        "y":oli[1],
+        "z":oli[2],
+        }

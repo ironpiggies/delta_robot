@@ -29,7 +29,7 @@ def put_toppings_on():
     '''
     print("Starting to put toppings on!")
 
-    
+
     make_pizza.add_toppings()
     make_pizza.add_shaker()
 

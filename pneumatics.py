@@ -40,7 +40,7 @@ def send_pump_cmd(pump_cmd,serialComm):
 blow_sec=1
 suck_sec=6
 hold_sec=.5
-ser=start_serial("/dev/cu.usbmodem1421")
+ser=start_serial("/dev/cu.usbmodem1411") #will need to change this port to whatever port we want to work with
 sleep(5) #waits for arduino to reset
 #print("here")
 send_pump_cmd(2,ser)
