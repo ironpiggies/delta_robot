@@ -5,7 +5,7 @@ def drop_topping(current_pos,dr,ser):
     '''
     if the current code isnt accurate enough we can lower down first then relase the topping
     '''
-    blow_time=2
+    blow_time=.25
     send_pump_cmd(2,ser) #blow to release
     sleep(blow_time)
     send_pump_cmd(3,ser) #hold after done blowing
@@ -16,8 +16,8 @@ def pick_up_topping(current_pos,dr,ser,z_dist):
     '''
     #change these to set blowing and suck parameters
     print "picking up"
-    blow_time=1
-    suck_time=4
+    blow_time=.5
+    suck_time=1.5
 
     final_pos=current_pos[::]
     final_pos[2]-=z_dist #move down by z
