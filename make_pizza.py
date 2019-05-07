@@ -11,7 +11,6 @@ def add_toppings(dr,ser):
     '''
     continues to add toppings
     '''
-    num_waypoints=20 #relevant if position control
     topping_z_offset=50 #mm how far away from toppings we want to be moving
 
     out_of_the_way_pos=[0,0,-100] #mm, not sure what this will be
