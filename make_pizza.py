@@ -6,37 +6,6 @@ from selector_help import get_dist_list, get_center_dist, get_available_holes_to
 from movement import drop_topping, pick_up_topping
 
 #ok this will be main code that will be referenced for main.py in terms of making the pizza
-'''
-here is what needs to happen:
-#while True:
-#move arms out of the way (can this even be done?)
-#capture image
-#toppings=color_code.get_all_toppings(image)
-#pizza=color_code.get_pizza(image) #gives pizza location and holes to place toppings into
-#turn pizza coordinates and toppings coordinates into x,y,z relative to the robot, not the camera
-#chosen_hole=hole_selector(toppings,pizza)#check to make sure no toppings in the hole we want to place in
-#top=topping_selector(toppings,pizza) #select based on criteria so that we don't choose toppings that are too close to pizza or other toppings
-#use iksolver to change top from x,y,z to theta1, theta2, theta3 coordinates so we can use with o drive (does this happen before or after path planning? maybe we do this too all the waypoints we pick? right before we send them to the odrives?)
-#path_to_topping=get_path(current_loc,top) #gives path from current position to where we want to do topping things. maybe this isnt really necessary
-#path_to_drop=get_path(top,chosen_hole)
-#move_along_path(path_to_topping) #only move on when we have the go ahead form the odrives
-#start_pickup_sequence() #this involves changing z position, blowing up baloon, force control to lower on topping and suction to grab it, then raising back up (keeping suction)
-#move_along_path(path_to_drop)
-#start_drop_sequence() #should just be releasing suction and/or blowing out
-#end while loop :P
-'''
-
-'''
-ok: here are the specific functions that we need and progress on them:
-
-capture_image() - needs to capture an image from the camera. should output a numpy array of an image. this could be in a separate file and imported
-get_all_toppings(image) - returns locations of toppings. input is numpy array image. currently under construction in color_code.py
-get_pizza(image) - returns locations of holes on pizza and location of pizza. will be in color_code.py and will have to be imported
-camera_to_robot(items) - returns transformed locations of items by applying rotation matrix and translation to transfrom coordinate frame from camera to robot
-hole_selector(toppings,pizza) - returns location of specific hole we want to place a topping into based on which holes are full. if all of the holes are full then we should stop putting toppings on and move on
-topping_selector(toppings,pizza) - returns location of the specific topping we want to pick up. based on location to other toppings and to the pizza
-#not sure after this about path planning what needs to happen. will discuss with other people.
-'''
 
 def add_toppings(dr,ser):
     '''
@@ -45,8 +14,10 @@ def add_toppings(dr,ser):
     num_waypoints=20 #relevant if position control
     topping_z_offset=50 #mm how far away from toppings we want to be moving
 
+    out_of_the_way_pos=[0,0,-100] #mm, not sure what this will be
+
     while True:
-        #current_pos=move_out_of_the_way(piggy_o,ds) sets what current_pos is and moves robot out of way to take pic
+        dr.moveXYZ(out_of_the_way_pos) # moves robot out of way to take pic
         items_dict={} #from jays code we get a dict of all the objects
         toppings,pizza=toppings_converter(items_dict)
         topping,hole=topping_and_hole_selector(toppings,pizza)
@@ -93,7 +64,7 @@ def topping_and_hole_selector(toppings,pizza):
 
     return(good_topping,good_hole)
 
-def camera_to_robot(position):
+def camera_to_robot(position): #update
     '''
     takes a 3x1 position vector and outputs a position relative to the robots frame
     '''
@@ -105,6 +76,7 @@ def camera_to_robot(position):
     return (out)
 
 def toppings_converter(items_dict): #im lazy so instead of rewriting everything ill just convert from jay's item output to the one i want :P
+    #update
     topping_list=[]
     hole_list=[]
     pizza={}
