@@ -9,7 +9,7 @@ from odrive.enums import *
 
 
 
-class detlaBot:
+class deltaBot:
     def __init__(self):
         self.RUN_REAL= True
         if self.RUN_REAL:
@@ -38,7 +38,7 @@ class detlaBot:
         except:
             print('Could not move')
             return 0
-            
+
     def setHighSpeed(self):
         self.motors.setHighSpeed()
 
@@ -49,7 +49,8 @@ class detlaBot:
 
 
 def main():
-    robo= detlaBot()
+    #example
+    robo= deltaBot()
     for i in range(5):
         #set low speed mode
         robo.setLowSpeed()
@@ -66,9 +67,6 @@ def main():
         robo.moveXYZ([100,-100,-700])
         robo.moveXYZ([-100,-100,-700])
         robo.moveXYZ([-100,100,-700])
-
-
-
 
 
 if __name__=="__main__":
