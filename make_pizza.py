@@ -3,7 +3,7 @@
 import numpy as np
 
 from selector_help import get_dist_list, get_center_dist, get_available_holes_toppings
-
+from movement import drop_topping, pick_up_topping
 
 #ok this will be main code that will be referenced for main.py in terms of making the pizza
 '''
@@ -38,19 +38,27 @@ topping_selector(toppings,pizza) - returns location of the specific topping we w
 #not sure after this about path planning what needs to happen. will discuss with other people.
 '''
 
-def add_toppings():
+def add_toppings(dr,ser):
     '''
     continues to add toppings
     '''
     num_waypoints=20 #relevant if position control
+    topping_z_offset=50 #mm how far away from toppings we want to be moving
+
     while True:
+        #current_pos=move_out_of_the_way(piggy_o,ds) sets what current_pos is and moves robot out of way to take pic
         items_dict={} #from jays code we get a dict of all the objects
         toppings,pizza=toppings_converter(items_dict)
         topping,hole=topping_and_hole_selector(toppings,pizza)
         if (topping and hole): #if we have a hole and topping selected
 
-            path=plan_path(topping,hole)
+            topping_loc=[topping["x"],topping["y"],topping["z"]+topping_z_offset]
+            hole_loc=[hole["x"],hole["y"],hole["z"]+topping_z_offset]
 
+            dr.moveXYZ(topping_loc)
+            pick_up_topping(topping_loc,dr,ser,topping_z_offset)
+            dr.moveXYZ(hole_loc)
+            drop_topping(hole_loc,dr,ser)
         else:
             print("Endind add_toppings() because no more holes or no more toppings")
             return()
