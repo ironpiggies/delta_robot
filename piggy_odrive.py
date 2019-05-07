@@ -2,6 +2,9 @@
 '''
 author achuwils
 for usage example, see test_odrive.py
+TODO: 
+    optimize gains
+    optimize the homing current threshold    
 '''
 
 import odrive
@@ -10,9 +13,10 @@ import time
 import math
 
 
-_HOMING_CURRENT_THRESHOLD = 1.8
+_HOMING_CURRENT_THRESHOLD = 3
 _POS_ERR_THRES = 0.008
-_MAXPOS_LIMIT = math.pi
+_MINPOS_LIMIT = math.radians(-45)
+_MAXPOS_LIMIT = math.radians(100)
 
 #2084377A3548  o1
 #2087377B3548  02
@@ -32,7 +36,7 @@ ready = False
 
 CPR2RAD = (2*math.pi/400000.00)
 CPR= 400000
-MAX_LIMIT = math.pi
+
 
 class piggydrive:
     def __init__(self):
@@ -47,18 +51,16 @@ class piggydrive:
         self.axis2 = self.odrv1.axis0
         #begin the homing process
         time.sleep(1)
-        self.axis0.controller.config.vel_gain = 0.0002
-        self.axis1.controller.config.vel_gain = 0.0002
-        self.axis2.controller.config.vel_gain = 0.0002
-        time.sleep(0.5)
-
-
         #set motors to velocity control mode
         self.axis0.controller.config.control_mode =CTRL_MODE_VELOCITY_CONTROL
         self.axis1.controller.config.control_mode =CTRL_MODE_VELOCITY_CONTROL
         self.axis2.controller.config.control_mode =CTRL_MODE_VELOCITY_CONTROL
         #rotate CW
-        time.sleep(0.5)         
+        time.sleep(0.5)
+        self.axis0.controller.config.vel_gain = 0.0003
+        self.axis1.controller.config.vel_gain = 0.0003
+        self.axis2.controller.config.vel_gain = 0.0003
+        time.sleep(0.5)
         self.axis0.controller.vel_setpoint = 10000
         self.axis1.controller.vel_setpoint = 10000
         self.axis2.controller.vel_setpoint = 10000
@@ -87,6 +89,7 @@ class piggydrive:
                 self.axis2.controller.vel_setpoint = 0
                 axis2_homed = True
                 print "axis 2 homed" 
+            #print self.axis1.motor.current_control.Iq_measured    
             time.sleep(0.01)
 
         time.sleep(1)
@@ -100,17 +103,38 @@ class piggydrive:
         self.axis1.controller.pos_setpoint = self.axis1_homepos
         self.axis2.controller.pos_setpoint = self.axis2_homepos
         print "switching to position control mode"
+        self.axis0.controller.config.vel_gain = 0.0001 #0.000015
+        self.axis1.controller.config.vel_gain = 0.0001 #0.000015
+        self.axis2.controller.config.vel_gain = 0.0001 #0.000015
         time.sleep(0.5)
         self.axis0.controller.config.control_mode =CTRL_MODE_POSITION_CONTROL
         self.axis1.controller.config.control_mode =CTRL_MODE_POSITION_CONTROL
         self.axis2.controller.config.control_mode =CTRL_MODE_POSITION_CONTROL
         time.sleep(0.5)
-        self.axis0.controller.config.vel_gain = 0.000015
-        self.axis1.controller.config.vel_gain = 0.000015
-        self.axis2.controller.config.vel_gain = 0.000015
-        self.axis0.controller.config.pos_gain = 50
-        self.axis1.controller.config.pos_gain = 50
-        self.axis2.controller.config.pos_gain = 50
+
+        self.axis0.controller.config.pos_gain = 100
+        self.axis1.controller.config.pos_gain = 100
+        self.axis2.controller.config.pos_gain = 100
+
+        self.axis0.motor.config.current_lim = 10
+        self.axis1.motor.config.current_lim = 10
+        self.axis2.motor.config.current_lim = 10
+
+        self.axis0.controller.config.vel_limit = 900000
+        self.axis1.controller.config.vel_limit = 900000
+        self.axis2.controller.config.vel_limit = 900000
+        
+
+        time.sleep(0.5)
+        self.setLowSpeed()
+        time.sleep(0.5)
+        #go horizontal
+        self.setJointPosWait([math.radians(45),math.radians(45),math.radians(45)])
+        #update the zero position as horizontal
+        self.axis0_homepos= self.axis0.encoder.pos_estimate
+        self.axis1_homepos= self.axis1.encoder.pos_estimate
+        self.axis2_homepos= self.axis2.encoder.pos_estimate
+
 
         print "odrives are ready"
         self.isReady = True
@@ -129,11 +153,14 @@ class piggydrive:
               for that, use the setJointPosWait function
         '''
         #check whether all values are inside limit
-        if((0<=posval[0]<=_MAXPOS_LIMIT) and (0<=posval[0]<=_MAXPOS_LIMIT) and (0<=posval[0]<=_MAXPOS_LIMIT)): 
+        if((_MINPOS_LIMIT<=posval[0]<=_MAXPOS_LIMIT) and (_MINPOS_LIMIT<=posval[0]<=_MAXPOS_LIMIT) and (_MINPOS_LIMIT<=posval[0]<=_MAXPOS_LIMIT)): 
             #print "setpos called", (posval[0]*CPR )/ (2* math.pi) + axis0_homepos,(posval[1]*CPR )/ (2* math.pi) + axis1_homepos,(posval[2]*CPR )/ (2* math.pi) + axis2_homepos
-            self.axis0.controller.pos_setpoint = int((-1*posval[0]*CPR )/ (2* math.pi) + self.axis0_homepos)
-            self.axis1.controller.pos_setpoint = int((-1*posval[1]*CPR )/ (2* math.pi) + self.axis1_homepos)
-            self.axis2.controller.pos_setpoint = int((-1*posval[2]*CPR )/ (2* math.pi) + self.axis2_homepos)
+            pos0_setpoint = int((-1*posval[0]*CPR )/ (2* math.pi) + self.axis0_homepos)
+            pos1_setpoint = int((-1*posval[1]*CPR )/ (2* math.pi) + self.axis1_homepos)
+            pos2_setpoint = int((-1*posval[2]*CPR )/ (2* math.pi) + self.axis2_homepos)
+            self.axis0.controller.move_to_pos(pos0_setpoint)
+            self.axis1.controller.move_to_pos(pos1_setpoint)
+            self.axis2.controller.move_to_pos(pos2_setpoint)
             return True
         else:
             print " commanded motor position out of safe limit"
@@ -151,3 +178,30 @@ class piggydrive:
                 curpos = self.getJointPos()
         return retval 
 
+    def setHighSpeed(self):
+        self.axis0.trap_traj.config.vel_limit = 720000
+        self.axis0.trap_traj.config.accel_limit = 600000
+        self.axis0.trap_traj.config.decel_limit = 600000
+
+        self.axis1.trap_traj.config.vel_limit = 720000
+        self.axis1.trap_traj.config.accel_limit = 600000
+        self.axis1.trap_traj.config.decel_limit = 600000
+
+        self.axis2.trap_traj.config.vel_limit = 720000
+        self.axis2.trap_traj.config.accel_limit = 600000
+        self.axis2.trap_traj.config.decel_limit = 600000
+
+
+    def setLowSpeed(self):
+        self.axis0.trap_traj.config.vel_limit = 200000
+        self.axis0.trap_traj.config.accel_limit = 100000
+        self.axis0.trap_traj.config.decel_limit = 100000
+        
+        self.axis1.trap_traj.config.vel_limit = 200000
+        self.axis1.trap_traj.config.accel_limit = 100000
+        self.axis1.trap_traj.config.decel_limit = 100000
+        
+        self.axis2.trap_traj.config.vel_limit = 200000
+        self.axis2.trap_traj.config.accel_limit = 100000
+        self.axis2.trap_traj.config.decel_limit = 100000
+        
