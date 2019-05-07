@@ -413,6 +413,6 @@ if __name__ == "__main__":
 	# Run testPlot to see plot simulation
 	# Run testIK to see numerical desired thetas
 	
-	# testPlot()
-	# testIK()
-	testvel()
+	testPlot()
+	testIK()
+	#testvel()
