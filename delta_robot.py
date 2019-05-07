@@ -49,6 +49,7 @@ class deltaBot:
 
 
 def main():
+    #example
     robo= deltaBot()
     for i in range(5):
         #set low speed mode
@@ -66,9 +67,6 @@ def main():
         robo.moveXYZ([100,-100,-700])
         robo.moveXYZ([-100,-100,-700])
         robo.moveXYZ([-100,100,-700])
-
-
-
 
 
 if __name__=="__main__":
