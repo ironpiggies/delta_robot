@@ -1,6 +1,8 @@
 #!/usr/bin/python
 
 import make_pizza
+import delta_robot
+import pneumatics
 
 '''
 #three main events need to happen:
@@ -12,14 +14,13 @@ main.py file pretty clean, as it will allow us to debug only one function at a t
 '''
 
 #easy enough to comment one out when we don't want to run everything.
-arduino_port="/dev/cu.usbmodem1411"
-
+arduino_port="/dev/cu.usbmodem1421"
+print "starting ser"
 ser=pneumatics.start_serial(arduino_port)
+print "starting dr"
 dr=delta_robot.deltaBot()
+dr.setLowSpeed()
 
-put_toppings_on(dr,ser)
-deliver_pizza(dr,ser)
-make_dough(dr,ser)
 
 
 def put_toppings_on(dr,ser):
@@ -36,7 +37,7 @@ def put_toppings_on(dr,ser):
 
 
     make_pizza.add_toppings(dr,ser)
-    make_pizza.add_shaker(dr,ser)
+    #make_pizza.add_shaker(dr,ser)
 
     return
 
@@ -69,3 +70,7 @@ def make_dough(dr,ser):
     #mash()
 
     return
+
+put_toppings_on(dr,ser)
+#deliver_pizza(dr,ser)
+#make_dough(dr,ser)

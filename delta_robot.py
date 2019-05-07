@@ -13,7 +13,7 @@ class deltaBot:
     def __init__(self):
         self.RUN_REAL= True
         if self.RUN_REAL:
-            import piggy_odrive   
+            import piggy_odrive
             self.motors = piggy_odrive.piggydrive()
             while(self.motors.isReady==False):
                 time.sleep(0.5)
@@ -27,14 +27,14 @@ class deltaBot:
         input is a list having the [x,y,z] values in millimeters
         NOTE: z axis is negative downwards
         '''
-        goalpos=inverse_kinematics.position(posval[0],posval[1],posval[2])
+        goalpos=inverse_kinematics.position(-posval[0],posval[1],posval[2]) #negative on x position because it is flipped somehow
         try:
             cmdtheta = self.kinsolver.ik(goalpos)
             self.kinsolver.updatePlot(goalpos)
             if self.RUN_REAL:
                 return self.motors.setJointPosWait(cmdtheta)
             else:
-                return 2 
+                return 2
         except:
             print('Could not move')
             return 0
@@ -44,12 +44,14 @@ class deltaBot:
 
     def setLowSpeed(self):
         self.motors.setLowSpeed()
-    
+
 
 
 
 def main():
     #example
+    print "example done"
+    '''
     robo= deltaBot()
     for i in range(5):
         #set low speed mode
@@ -59,7 +61,7 @@ def main():
         robo.moveXYZ([100,-100,-700])
         robo.moveXYZ([-100,-100,-700])
         robo.moveXYZ([-100,100,-700])
-    
+
         #set high speed mode
         #draw a rectange
         robo.setHighSpeed()
@@ -67,7 +69,7 @@ def main():
         robo.moveXYZ([100,-100,-700])
         robo.moveXYZ([-100,-100,-700])
         robo.moveXYZ([-100,100,-700])
-
+    '''
 
 if __name__=="__main__":
     main()

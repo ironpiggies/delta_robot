@@ -35,7 +35,7 @@ def send_pump_cmd(pump_cmd,serialComm):
 
 #more testing!
 
-
+'''
 #these numbers are a good starting point. suck_time should be for however long we are moving for
 blow_sec=1
 suck_sec=6
@@ -52,3 +52,4 @@ sleep(suck_sec)
 send_pump_cmd(2,ser)
 sleep(blow_sec)
 send_pump_cmd(3,ser)
+'''

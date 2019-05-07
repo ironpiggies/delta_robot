@@ -4,24 +4,29 @@ import numpy as np
 
 from selector_help import get_dist_list, get_center_dist, get_available_holes_toppings
 from movement import drop_topping, pick_up_topping
-
+from time import sleep
 #ok this will be main code that will be referenced for main.py in terms of making the pizza
 
 def add_toppings(dr,ser):
     '''
     continues to add toppings
     '''
-    topping_z_offset=50 #mm how far away from toppings we want to be moving
+    topping_z_offset=100 #mm how far away from toppings we want to be moving
 
-    out_of_the_way_pos=[0,0,-100] #mm, not sure what this will be
+    out_of_the_way_pos=[0,0,-700] #mm, not sure what this will be
 
     while True:
-        dr.moveXYZ(out_of_the_way_pos) # moves robot out of way to take pic
+        dr.moveXYZ(out_of_the_way_pos)
+        print "moved to out of the way"
+        sleep(3)
+        print "pic taken (sorta)" # moves robot out of way to take pic
         items_dict={} #from jays code we get a dict of all the objects
-        toppings,pizza=toppings_converter(items_dict)
-        topping,hole=topping_and_hole_selector(toppings,pizza)
+        #toppings,pizza=toppings_converter(items_dict)
+        #topping,hole=topping_and_hole_selector(toppings,pizza)
+        topping={"name":"pep","x":0,"y":200,"z":-700,}
+        hole={"x":200,"y":0,"z":-700,}
         if (topping and hole): #if we have a hole and topping selected
-
+            print "starting move"
             topping_loc=[topping["x"],topping["y"],topping["z"]+topping_z_offset]
             hole_loc=[hole["x"],hole["y"],hole["z"]+topping_z_offset]
 

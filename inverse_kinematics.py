@@ -4,7 +4,7 @@ Closed form solutions to solve the Inverse Kinematics of Delta Robot
 INPUT: Goal position
 OUTPUT: Desired thetas
 
-To run this code, 
+To run this code,
 1) Create a position object with your x, y, z goal coords
 2) Create a deltaSolver object
 3) Pass in your goal to the ik method of the deltaSolver
@@ -74,7 +74,7 @@ class deltaSolver(object):
 		self.ub = (sqrt(3)/3) * self.sb
 		self.wp = (sqrt(3)/6) * self.sp
 		self.up = (sqrt(3)/3) * self.sp
-		
+
 		self.a = self.wb - self.up
 		self.b = self.sp/2 - (sqrt(3)/2) * self.wb
 		self.c = self.wp - self.wb/2
@@ -102,7 +102,7 @@ class deltaSolver(object):
 		x_valid = False
 		y_valid = False
 		z_valid = False
-		
+
 		if table_x_min <= goal.x <= table_x_max:
 			x_valid = True
 
@@ -154,14 +154,14 @@ class deltaSolver(object):
 
 		if(thetaID == 1):
 			currTheta = self.currTheta1
-		
+
 		elif(thetaID == 2):
 			currTheta = self.currTheta2
 
 		elif(thetaID == 3):
 			currTheta = self.currTheta3
 
-		# Calculate the difference between the possible angles that solves the quadratic with current angle. 
+		# Calculate the difference between the possible angles that solves the quadratic with current angle.
 		thetaDiff1 = thetaPossible1 - currTheta
 		thetaDiff2 = thetaPossible2 - currTheta
 		# Return the theta that is closest to the current theta
@@ -177,7 +177,7 @@ class deltaSolver(object):
 			raise ValueError('Goal is outside of workspace')
 
 	def FK(self,thts):
-		# Works regardless of length unit. Angle units are in radians. 
+		# Works regardless of length unit. Angle units are in radians.
 		th1, th2, th3 = thts
 		def simulEqns(inp):
 			(x, y, z) = inp
@@ -186,15 +186,15 @@ class deltaSolver(object):
 			a = self.a
 			b = self.b
 			c = self.c
-			eq1 = 2*z*L*sin(th1) + x*x + y*y + z*z - l*l + L*L + a*a + 2*y*a + 2*L*(y+a)*cos(th1) 
-			eq2 = 2*z*L*sin(th2) + x*x + y*y + z*z - l*l + L*L + b*b + c*c + 2*x*b + 2*y*c - L*(sqrt(3)*(x+b)+y+c)*cos(th2) 
+			eq1 = 2*z*L*sin(th1) + x*x + y*y + z*z - l*l + L*L + a*a + 2*y*a + 2*L*(y+a)*cos(th1)
+			eq2 = 2*z*L*sin(th2) + x*x + y*y + z*z - l*l + L*L + b*b + c*c + 2*x*b + 2*y*c - L*(sqrt(3)*(x+b)+y+c)*cos(th2)
 			eq3 = 2*z*L*sin(th3) + x*x + y*y + z*z - l*l + L*L + b*b + c*c - 2*x*b + 2*y*c + L*(sqrt(3)*(x-b)-y-c)*cos(th3)
 			return (eq1, eq2, eq3)
 		return fsolve(simulEqns,(0,0,-500))
 
 	def vel(self, inputVec):
 		#inputVec is a vector in meters per second. [xdot, ydot, zdot]
-		
+
 		a11 = self.x
 		a12 = self.y+self.a + self.L*cos(self.currTheta1)
 		a13 = self.z + self.L*sin(self.currTheta1)
@@ -207,16 +207,16 @@ class deltaSolver(object):
 		a32 = 2*(self.y + self.c) - self.L*cos(self.currTheta3)
 		a33 = 2*(self.z + self.L*sin(self.currTheta3))
 
-		A = np.matrix([[a11, a12, a13], 
-					   [a21, a22, a23], 
+		A = np.matrix([[a11, a12, a13],
+					   [a21, a22, a23],
 					   [a31, a32, a33]])
 
 		b11 = self.L*((self.y + self.a)*sin(self.currTheta1) - self.z*cos(self.currTheta1))
 		b22 = -self.L*((sqrt(3)*(self.x + self.b) + self.y + self.c)*sin(self.currTheta2) + 2*self.z*cos(self.currTheta2))
 		b33 = self.L*((sqrt(3)*(self.x-self.b) - self.y - self.c)*sin(self.currTheta3) - 2*self.z*cos(self.currTheta3))
-		
-		B = np.matrix([[b11, 0, 0], 
-					   [0, b22, 0], 
+
+		B = np.matrix([[b11, 0, 0],
+					   [0, b22, 0],
 					   [0, 0, b33]])
 
 		B_inv = np.linalg.inv(B)
@@ -253,7 +253,7 @@ class deltaSolver(object):
 		basePts = np.hstack((base1, base2, base3, base1))
 		basePts = np.array(basePts)
 		ax.plot(basePts[0,:] ,basePts[1,:], basePts[2,:],c='k')
-		
+
 		#Plot Origin Axes
 		p = np.array([0, 0, 0])
 		a1 = p+np.array([100,0,0])
@@ -374,7 +374,7 @@ class deltaSolver(object):
 		    return False
 		if(theta1 <= -pi/2):
 		    return False
-		  
+
 		return True
 
 
@@ -409,10 +409,11 @@ def testvel():
 	desired_vel = [5, 5, 0]	# In mm/s
 	print("Desired thetadots:", ds.vel(desired_vel))
 
-if __name__ == "__main__":
+#if __name__ == "__main__":
+	#x=4
 	# Run testPlot to see plot simulation
 	# Run testIK to see numerical desired thetas
-	
-	testPlot()
-	testIK()
+
+	#testPlot()
+	#testIK()
 	#testvel()
