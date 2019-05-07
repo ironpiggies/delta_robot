@@ -30,11 +30,11 @@ def add_toppings(dr,ser):
             dr.moveXYZ(hole_loc)
             drop_topping(hole_loc,dr,ser)
         else:
-            print("Endind add_toppings() because no more holes or no more toppings")
+            print("Ending add_toppings() because no more holes or no more toppings")
             return()
 
 
-def add_shaker():
+def add_shaker(dr,ser):
     '''
         image=capture_image()
         shaker=get_shaker(image)

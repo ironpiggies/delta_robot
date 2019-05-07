@@ -12,12 +12,17 @@ main.py file pretty clean, as it will allow us to debug only one function at a t
 '''
 
 #easy enough to comment one out when we don't want to run everything.
-put_toppings_on()
-deliver_pizza()
-make_dough()
+arduino_port="/dev/cu.usbmodem1411"
+
+ser=pneumatics.start_serial(arduino_port)
+dr=delta_robot.deltaBot()
+
+put_toppings_on(dr,ser)
+deliver_pizza(dr,ser)
+make_dough(dr,ser)
 
 
-def put_toppings_on():
+def put_toppings_on(dr,ser):
     '''
     loop:
     first we gather list of toppings and x,y coordinates as well as pizza(and its holes)
@@ -30,12 +35,12 @@ def put_toppings_on():
     print("Starting to put toppings on!")
 
 
-    make_pizza.add_toppings()
-    make_pizza.add_shaker()
+    make_pizza.add_toppings(dr,ser)
+    make_pizza.add_shaker(dr,ser)
 
     return
 
-def deliver_pizza():
+def deliver_pizza(dr,ser):
     '''
     first we need to tell mobile robot we are ready. then wait for mobile robot
     to tell us that it is ready. then we execute command to push pizza. then tell
@@ -51,7 +56,7 @@ def deliver_pizza():
 
     return
 
-def make_dough():
+def make_dough(dr,ser):
     '''
     first we need to wait until we see the dough on the table
     then we identify where it is and do force control (or velocity control?) to mash it
