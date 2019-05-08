@@ -21,9 +21,12 @@ def add_toppings(dr,ser,camera):
         items_dict=camera.find_toppings() #from jays code we get a dict of all the objects
         print "pic taken"
         print(items_dict)
+        print "****************!!!!!!"
         toppings,pizza=toppings_converter(items_dict)
         print toppings, pizza
+        print "*********"
         toppings=camera_to_robot_list(toppings)
+        print toppings
         pizza=camera_to_robot_dict(pizza)
         print toppings,pizza
         topping,hole=topping_and_hole_selector(toppings,pizza)
