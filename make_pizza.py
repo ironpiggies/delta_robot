@@ -13,10 +13,10 @@ def add_toppings(dr,ser,camera):
     '''
     topping_z_offset=100 #mm how far away from toppings we want to be moving
 
-    out_of_the_way_pos=[0,0,-600] #mm, not sure what this will be
+    out_of_the_way_pos=[-290,-275,-600] #mm,
 
     while True:
-        #dr.moveXYZ(out_of_the_way_pos)
+        dr.moveXYZ(out_of_the_way_pos)
         print "moved to out of the way" # moves robot out of way to take pic
         items_dict=camera.find_toppings() #from jays code we get a dict of all the objects
         print "pic taken"

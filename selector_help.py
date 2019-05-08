@@ -32,7 +32,7 @@ def get_available_holes_toppings(toppings,pizza):
 
     will make selection a lot easier
     '''
-    ds=deltaSolver()
+    ds=deltaSolver() #to help check
 
     hole_radius= 10#in mm
 
