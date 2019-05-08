@@ -4,6 +4,10 @@ import make_pizza
 import delta_robot
 import pneumatics
 
+import sys
+sys.path.append('modules/')
+import chef_vision
+
 '''
 #three main events need to happen:
 #1)put toppings on pizza
@@ -14,16 +18,19 @@ main.py file pretty clean, as it will allow us to debug only one function at a t
 '''
 
 #easy enough to comment one out when we don't want to run everything.
-arduino_port="/dev/cu.usbmodem1421"
+arduino_port="/dev/cu.usbmodem14131"
+camera_port="/dev/cu.usbmodem145"
+
 print "starting ser"
 ser=pneumatics.start_serial(arduino_port)
+print "starting camera"
+camera=chef_vision.ChefVision()
 print "starting dr"
 dr=delta_robot.deltaBot()
 dr.setLowSpeed()
 
 
-
-def put_toppings_on(dr,ser):
+def put_toppings_on(dr,ser,camera):
     '''
     loop:
     first we gather list of toppings and x,y coordinates as well as pizza(and its holes)
@@ -36,12 +43,12 @@ def put_toppings_on(dr,ser):
     print("Starting to put toppings on!")
 
 
-    make_pizza.add_toppings(dr,ser)
+    make_pizza.add_toppings(dr,ser,camera)
     #make_pizza.add_shaker(dr,ser)
 
     return
 
-def deliver_pizza(dr,ser):
+def deliver_pizza(dr,ser,camera):
     '''
     first we need to tell mobile robot we are ready. then wait for mobile robot
     to tell us that it is ready. then we execute command to push pizza. then tell
@@ -57,7 +64,7 @@ def deliver_pizza(dr,ser):
 
     return
 
-def make_dough(dr,ser):
+def make_dough(dr,ser,camera):
     '''
     first we need to wait until we see the dough on the table
     then we identify where it is and do force control (or velocity control?) to mash it
@@ -71,6 +78,6 @@ def make_dough(dr,ser):
 
     return
 
-put_toppings_on(dr,ser)
+put_toppings_on(dr,ser,camera)
 #deliver_pizza(dr,ser)
 #make_dough(dr,ser)

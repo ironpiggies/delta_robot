@@ -7,7 +7,7 @@ from movement import drop_topping, pick_up_topping
 from time import sleep
 #ok this will be main code that will be referenced for main.py in terms of making the pizza
 
-def add_toppings(dr,ser):
+def add_toppings(dr,ser,camera):
     '''
     continues to add toppings
     '''
@@ -17,12 +17,13 @@ def add_toppings(dr,ser):
 
     while True:
         dr.moveXYZ(out_of_the_way_pos)
-        print "moved to out of the way"
-        sleep(3)
-        print "pic taken (sorta)" # moves robot out of way to take pic
-        items_dict={} #from jays code we get a dict of all the objects
-        #toppings,pizza=toppings_converter(items_dict)
-        #topping,hole=topping_and_hole_selector(toppings,pizza)
+        print "moved to out of the way" # moves robot out of way to take pic
+        items_dict=camera.find_toppings() #from jays code we get a dict of all the objects
+        print "pic taken"
+        print(items_dict)
+        toppings,pizza=toppings_converter(items_dict)
+        print toppings,pizza
+        topping,hole=topping_and_hole_selector(toppings,pizza)
         topping={"name":"pep","x":0,"y":200,"z":-700,}
         hole={"x":200,"y":0,"z":-700,}
         if (topping and hole): #if we have a hole and topping selected
@@ -84,7 +85,7 @@ def toppings_converter(items_dict): #im lazy so instead of rewriting everything 
     topping_list=[]
     hole_list=[]
     pizza={}
-    for pep in items_dict['red_circles']: #exact key might change
+    for pep in items_dict['red_cirs']: #exact key might change
         topping={
         "name":"pepperoni",
         "x":pep[0],
@@ -116,7 +117,7 @@ def toppings_converter(items_dict): #im lazy so instead of rewriting everything 
         "z":oli[2],
         }
         topping_list.append(topping)
-    for anch in items_dict('blue_fish'):
+    for anch in items_dict('blue_fishes'):
         topping={
         "name":"anchovy",
         "x":anch[0],
@@ -124,7 +125,7 @@ def toppings_converter(items_dict): #im lazy so instead of rewriting everything 
         "z":anch[2],
         }
         topping_list.append(topping)
-    for hole in items_dict('holes'):
+    for hole in items_dict('pizza_outers'):
         temp_hole={
         "name":"hole",
         "x":hole[0],
@@ -132,6 +133,7 @@ def toppings_converter(items_dict): #im lazy so instead of rewriting everything 
         "z":hole[2],
         }
         hole_list.append(temp_hole)
-    pizza=items_dict["pizza"]
+    pizza={}
+    pizza["pizza"]=items_dict["pizza_inners"]
     pizza["holes"]=hole_list #should have x,y,z coordinates and radius
     return topping_list,pizza
