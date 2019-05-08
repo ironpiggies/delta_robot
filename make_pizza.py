@@ -1,5 +1,5 @@
 #!/usr/bin/python
-
+from toppings import item, pizza_item
 import numpy as np
 
 from selector_help import get_dist_list, get_center_dist, get_available_holes_toppings
@@ -13,29 +13,34 @@ def add_toppings(dr,ser,camera):
     '''
     topping_z_offset=100 #mm how far away from toppings we want to be moving
 
-    out_of_the_way_pos=[0,0,-500] #mm, not sure what this will be
+    out_of_the_way_pos=[0,0,-600] #mm, not sure what this will be
 
     while True:
-        dr.moveXYZ(out_of_the_way_pos)
+        #dr.moveXYZ(out_of_the_way_pos)
         print "moved to out of the way" # moves robot out of way to take pic
         items_dict=camera.find_toppings() #from jays code we get a dict of all the objects
         print "pic taken"
         print(items_dict)
         print "****************!!!!!!"
+        items_dict['pizza_outers']=[0,0,-600]
+        items_dict['red_cirs']=[[-150,100,-600]]
+        items_dict['yellow_triangles']=[[-50,0,-600]]
+        items_dict['pizza_inners']=[[-100, -50,-600],[-100,-100,-600]]
         toppings,pizza=toppings_converter(items_dict)
-        print toppings, pizza
-        print "*********"
-        toppings=camera_to_robot_list(toppings)
-        print toppings
-        pizza=camera_to_robot_dict(pizza)
-        print toppings,pizza
+
+        camera_to_robot_list(toppings)
+        camera_to_robot_pizza(pizza)
+        for topping in toppings:
+            print topping.pos
         topping,hole=topping_and_hole_selector(toppings,pizza)
-        topping={"name":"pep","x":0,"y":200,"z":-500,}
-        hole={"x":200,"y":0,"z":-500,}
+        #topping=item([0,200,-500],'pep')
+        #hole=item([200,0,-500],'hole')
         if (topping and hole): #if we have a hole and topping selected
             print "starting move"
-            topping_loc=[topping["x"],topping["y"],topping["z"]+topping_z_offset]
-            hole_loc=[hole["x"],hole["y"],hole["z"]+topping_z_offset]
+            topping_loc=topping.pos[::]
+            hole_loc=hole.pos[::]
+            topping_loc[2]+=topping_z_offset
+            hole_loc[2]+=topping_z_offset
 
             dr.moveXYZ(topping_loc)
             pick_up_topping(topping_loc,dr,ser,topping_z_offset)
@@ -65,7 +70,6 @@ def topping_and_hole_selector(toppings,pizza):
     good_topping=False #the topping we want to pick up
     good_hole=False
     avail_toppings,avail_holes=get_available_holes_toppings(toppings,pizza)
-
     #for now, just select the first available topping and the first available hole
     try:
         good_topping=avail_toppings[0]
@@ -75,55 +79,14 @@ def topping_and_hole_selector(toppings,pizza):
 
     return(good_topping,good_hole)
 
-def camera_to_robot_dict(dict):
-    try:
-        rotate=np.array([[-1,0,0],
-                         [0,-1,0],
-                         [0,0,1]]) #180 degree rotation about x
-        translate=np.array([[-265],
-                            [0],
-                            [0]]) #26.5 cenitmeters in negative x
+def camera_to_robot_pizza(pizza):
 
-        new_pizza={}
-        new_holes=[]
-        for hole in dict["holes"]:
-            hole_coords=np.array([hole["x"],hole["y"],hole["z"]])
-            hole_coords_new=np.add(np.dot(rotate,hole_coords),translate)
-            new_holes.append(hole_coords_new)
-
-        pizza_coords=dict["pizza"]
-        pizza_coords_new=np.add(np.dot(rotate,pizza_coords),translate)
-        new_pizza["holes"]=new_holes
-        pizza_dict={
-            "x":pizza_coords_new[0],
-            "y":pizza_coords_new[1],
-            "z":pizza_coords_new[2],
-        }
-        new_pizza["pizza"]=pizza_dict
-        return new_pizza
-    except:
-        print("no pizza detected!")
-        new_pizza={"holes":[],"pizza":{"x":0,"y":0,"z":0},}
-        return new_pizza
+    pizza.convert()
+    camera_to_robot_list(pizza.holes)
 
 def camera_to_robot_list(item_list): #update
-    '''
-    takes a 3x1 position vector and outputs a position relative to the robots frame
-    '''
-    new_list=[]
-    rotate=np.array([[-1,0,0],[0,-1,0],[0,0,1]]) #180 degree rotation about x
-    translate=np.array([[-265],[0],[0]]) #26.5 cenitmeters in negative x
     for item in item_list:
-        out=item
-        coords=np.array([item["x"],item["y"],item["z"]])
-
-        out_coords=np.add(np.dot(rotate,coords),translate)
-        out["x"]=out_coords[0]
-        out["y"]=out_coords[1]
-        out["z"]=out_coords[2]
-        new_list.append(out)
-
-    return (new_list)
+        item.convert()
 
 def toppings_converter(items_dict): #im lazy so instead of rewriting everything ill just convert from jay's item output to the one i want :P
     #update
@@ -131,54 +94,22 @@ def toppings_converter(items_dict): #im lazy so instead of rewriting everything 
     hole_list=[]
     pizza={}
     for pep in items_dict['red_cirs']: #exact key might change
-        topping={
-        "name":"pepperoni",
-        "x":pep[0],
-        "y":pep[1],
-        "z":pep[2],
-        }
+        topping=item(pep,'pep')
         topping_list.append(topping)
     for ham in items_dict['pink_squares']: #exact key might change
-        topping={
-        "name":"ham",
-        "x":ham[0],
-        "y":ham[1],
-        "z":ham[2],
-        }
+        topping=item(ham,'ham')
         topping_list.append(topping)
     for pine in items_dict['yellow_triangles']:
-        topping={
-        "name":"pineapple",
-        "x":pine[0],
-        "y":pine[1],
-        "z":pine[2],
-        }
+        topping=item(pine,'pine')
         topping_list.append(topping)
     for oli in items_dict['black_rings']:
-        topping={
-        "name":"olive",
-        "x":oli[0],
-        "y":oli[1],
-        "z":oli[2],
-        }
+        topping=item(oli,'olive')
         topping_list.append(topping)
-    for anch in items_dict['blue_fishes']:
-        topping={
-        "name":"anchovy",
-        "x":anch[0],
-        "y":anch[1],
-        "z":anch[2],
-        }
+    for fish in items_dict['blue_fishes']:
+        topping=item(fish,'fish')
         topping_list.append(topping)
     for hole in items_dict['pizza_inners']:
-        temp_hole={
-        "name":"hole",
-        "x":hole[0],
-        "y":hole[1],
-        "z":hole[2],
-        }
+        temp_hole=item(hole,'hole')
         hole_list.append(temp_hole)
-    pizza={}
-    pizza["pizza"]=items_dict["pizza_outers"]
-    pizza["holes"]=hole_list #should have x,y,z coordinates and radius
+    pizza=pizza_item(items_dict["pizza_outers"],hole_list)
     return topping_list,pizza

@@ -27,7 +27,7 @@ camera=chef_vision.ChefVision()
 print "starting dr"
 dr=delta_robot.deltaBot()
 dr.setLowSpeed()
-
+#dr=1
 
 def put_toppings_on(dr,ser,camera):
     '''

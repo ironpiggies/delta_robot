@@ -3,13 +3,15 @@ for use in selecting the right toppings and holes
 '''
 
 import numpy as np
+from math import sqrt
+from inverse_kinematics import deltaSolver
 
 def get_center_dist(topping1,topping2):
-    print "999999"
-    print topping1
-    print topping2
-    xdiff=topping1["x"]-topping2["x"]
-    ydiff=topping1["y"]-topping2["y"] #not sure if topping is a dictionary or class or what
+
+    pos1=topping1.pos
+    pos2=topping2.pos
+    xdiff=pos1[0]-pos2[0]
+    ydiff=pos1[1]-pos2[1] #not sure if topping is a dictionary or class or what
 
     dist=sqrt(xdiff**2+ydiff**2) #distance between centers
     return dist
@@ -30,14 +32,16 @@ def get_available_holes_toppings(toppings,pizza):
 
     will make selection a lot easier
     '''
-    hole_radius= 50#in mm
+    ds=deltaSolver()
+
+    hole_radius= 10#in mm
 
     pizza_offset=50#in mm
-    pizza_radius=200 #distance from center of pizza
+    pizza_radius=20 #distance from center of pizza
 
-    topping_radius=50#in mm, min distance between two toppings
+    topping_radius=10#in mm, min distance between two toppings
 
-    pizza_center=pizza["pizza"]
+    pizza_center=pizza
 
     toppings_on_pizza=[]
     holes_filled=[]
@@ -46,27 +50,29 @@ def get_available_holes_toppings(toppings,pizza):
     holes_open=[]
 
     for topping in toppings:
-        for hole in pizza["holes"]:
+        for hole in pizza.holes:
             if (get_center_dist(topping,hole)<hole_radius): #topping is in a hole
                 holes_filled.append(hole)
-                toppings_on_pizza.append(topping["name"])
+                toppings_on_pizza.append(topping.name)
 
     for topping in toppings:
-        if (get_center_dist(topping,pizza_center)>pizza_radius):   #if topping is outside of pizza
-            if min(get_dist_list(topping,toppings))>topping_radius: #if topping is far enough away from other toppings
-                if len(toppings_on_pizza)<5: #if not all types of toppings are on yet. I think there are 5 diff types of toppings
+        if (get_center_dist(topping,pizza_center)>pizza_radius): #if topping is outside of pizza
+            if ds.check_workspace(topping.pos): #if it is in our viable workspace
+                dist_list=get_dist_list(topping,toppings)
+                #only sees one topping then get_dist_list returns None
+                if (not dist_list or min(dist_list)>topping_radius): #if topping is far enough away from other toppings
+                    if len(toppings_on_pizza)<5: #if not all types of toppings are on yet. I think there are 5 diff types of toppings
+                        if (topping.name not in toppings_on_pizza): #avoid toppings we have already added
 
-                    if (topping["name"] not in toppings_on_pizza): #avoid toppings we have already added
-                        toppings_open.append(topping)
-                        print("A "+topping["name"]+ "is available for pickup at ("+topping["x"]+","+topping["y"]+")") #prints topping name and location
-                else:
-                    toppings_open.append(topping) #if all toppings are on, then all toppings are available to put on
+                            toppings_open.append(topping)
+                            print("A "+topping.name+ " is available for pickup at ("+str(topping.pos[0])+","+str(topping.pos[1])+")") #prints topping name and location
+                    else:
+                        toppings_open.append(topping) #if all toppings are on, then all toppings are available to put on
 
-    for hole in pizza["holes"]: #now add holes that aren't in holed_filled
+    for hole in pizza.holes: #now add holes that aren't in holed_filled
         if (hole not in holes_filled):
             holes_open.append(hole)
 
     print "Toppings on pizza: "
     print toppings_on_pizza #sanity check
-
     return toppings_open,holes_open

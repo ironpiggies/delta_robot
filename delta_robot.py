@@ -37,6 +37,7 @@ class deltaBot:
                 return 2
         except:
             print('Could not move')
+            print(posval)
             return 0
 
     def setHighSpeed(self):

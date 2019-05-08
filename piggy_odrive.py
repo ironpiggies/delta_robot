@@ -15,8 +15,8 @@ import math
 
 _HOMING_CURRENT_THRESHOLD = 3
 _POS_ERR_THRES = 0.008
-_MINPOS_LIMIT = math.radians(-45)
-_MAXPOS_LIMIT = math.radians(100)
+_MINPOS_LIMIT = math.radians(-44)
+_MAXPOS_LIMIT = math.radians(90)
 
 #2084377A3548  o1
 #2087377B3548  02
