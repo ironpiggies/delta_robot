@@ -91,7 +91,7 @@ class deltaSolver(object):
 		self.plot(position(xx,yy,zz))
 
 	def check_workspace(self, goal):
-		# Goal is a position object
+		# check trapezoidal workspace
         y_min = -320
         y_max = 305
         xcorners = [-160,160,-305,305]
