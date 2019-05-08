@@ -18,8 +18,7 @@ main.py file pretty clean, as it will allow us to debug only one function at a t
 '''
 
 #easy enough to comment one out when we don't want to run everything.
-arduino_port="/dev/cu.usbmodem14131"
-camera_port="/dev/cu.usbmodem145"
+arduino_port="/dev/ttyACM0"
 
 print "starting ser"
 ser=pneumatics.start_serial(arduino_port)

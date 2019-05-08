@@ -283,7 +283,7 @@ class ChefVision:
         :param center: (x, y) of a topping
         :param depth_frame: depth frame from RealSense
         :param depth_img: depth image of shape (h, w)
-        :return: (x, y, z) of its center
+        :return: (x, y, z) of its center in millimeters
         """
         h_im, w_im = depth_img.shape
         w_frame = depth_frame.get_width()
@@ -293,6 +293,10 @@ class ChefVision:
         depth = depth_frame.get_distance(depth_pixel[0], depth_pixel[1])
         depth_intr = depth_frame.profile.as_video_stream_profile().intrinsics
         depth_point = rs.rs2_deproject_pixel_to_point(depth_intr, depth_pixel, depth)
+
+        # meters to millimeters
+        depth_point = [x*1000 for x in depth_point]
+
         return depth_point
 
     def find_yellow_triangles(self, color_img):
