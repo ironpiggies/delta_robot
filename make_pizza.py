@@ -22,7 +22,8 @@ def add_toppings(dr,ser,camera):
         print "pic taken"
         print(items_dict)
         toppings,pizza=toppings_converter(items_dict)
-        #toppings=camera_to_robot()
+        toppings=camera_to_robot()
+        pizza=camera_to_robot()
         print toppings,pizza
         topping,hole=topping_and_hole_selector(toppings,pizza)
         topping={"name":"pep","x":0,"y":200,"z":-500,}
@@ -74,11 +75,16 @@ def camera_to_robot(position): #update
     '''
     takes a 3x1 position vector and outputs a position relative to the robots frame
     '''
+    out=position
+    coords=[position["x"],position["y"],position["z"]]
     rotate=np.array([[-1,0,0],[0,-1,0],[0,0,1]]) #180 degree rotation about x
     translate=np.array([[-265],[0],[0]]) #26.5 cenitmeters in negative x
     print(rotate)
     print(translate)
-    out=np.add(np.dot(rotate,position),translate)
+    out_coords=np.add(np.dot(rotate,coords),translate)
+    out["x"]=out_coords[0]
+    out["y"]=out_coords[1]
+    out["z"]=out_coords[2]
     return (out)
 
 def toppings_converter(items_dict): #im lazy so instead of rewriting everything ill just convert from jay's item output to the one i want :P
@@ -102,7 +108,7 @@ def toppings_converter(items_dict): #im lazy so instead of rewriting everything 
         "z":ham[2],
         }
         topping_list.append(topping)
-    for pine in items_dict('yellow_triangles'):
+    for pine in items_dict['yellow_triangles']:
         topping={
         "name":"pineapple",
         "x":pine[0],
@@ -110,7 +116,7 @@ def toppings_converter(items_dict): #im lazy so instead of rewriting everything 
         "z":pine[2],
         }
         topping_list.append(topping)
-    for oli in items_dict('black_rings'):
+    for oli in items_dict['black_rings']:
         topping={
         "name":"olive",
         "x":oli[0],
@@ -118,7 +124,7 @@ def toppings_converter(items_dict): #im lazy so instead of rewriting everything 
         "z":oli[2],
         }
         topping_list.append(topping)
-    for anch in items_dict('blue_fishes'):
+    for anch in items_dict['blue_fishes']:
         topping={
         "name":"anchovy",
         "x":anch[0],
@@ -126,7 +132,7 @@ def toppings_converter(items_dict): #im lazy so instead of rewriting everything 
         "z":anch[2],
         }
         topping_list.append(topping)
-    for hole in items_dict('pizza_outers'):
+    for hole in items_dict['pizza_inners']:
         temp_hole={
         "name":"hole",
         "x":hole[0],
@@ -135,6 +141,6 @@ def toppings_converter(items_dict): #im lazy so instead of rewriting everything 
         }
         hole_list.append(temp_hole)
     pizza={}
-    pizza["pizza"]=items_dict["pizza_inners"]
+    pizza["pizza"]=items_dict["pizza_outers"]
     pizza["holes"]=hole_list #should have x,y,z coordinates and radius
     return topping_list,pizza

@@ -30,9 +30,11 @@ def get_available_holes_toppings(toppings,pizza):
     hole_radius= 50#in mm
 
     pizza_offset=50#in mm
-    pizza_radius=float(pizza["radius"])+pizza_offset #distance from center of pizza
+    pizza_radius=200 #distance from center of pizza
 
     topping_radius=50#in mm, min distance between two toppings
+
+    pizza_center=pizza["pizza"]
 
     toppings_on_pizza=[]
     holes_filled=[]
@@ -47,7 +49,7 @@ def get_available_holes_toppings(toppings,pizza):
                 toppings_on_pizza.append(topping["name"])
 
     for topping in toppings:
-        if (get_center_dist(topping,pizza)>pizza_radius):   #if topping is outside of pizza
+        if (get_center_dist(topping,pizza_center)>pizza_radius):   #if topping is outside of pizza
             if min(get_dist_list(topping,toppings))>topping_radius: #if topping is far enough away from other toppings
                 if len(toppings_on_pizza)<5: #if not all types of toppings are on yet. I think there are 5 diff types of toppings
 
