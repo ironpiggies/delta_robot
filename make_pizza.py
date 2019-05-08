@@ -77,24 +77,34 @@ def topping_and_hole_selector(toppings,pizza):
 
 def camera_to_robot_dict(dict):
     try:
-        rotate=np.array([[-1,0,0],[0,-1,0],[0,0,1]]) #180 degree rotation about x
-        translate=np.array([[-265],[0],[0]]) #26.5 cenitmeters in negative x
+        rotate=np.array([[-1,0,0],
+                         [0,-1,0],
+                         [0,0,1]]) #180 degree rotation about x
+        translate=np.array([[-265],
+                            [0],
+                            [0]]) #26.5 cenitmeters in negative x
 
         new_pizza={}
         new_holes=[]
         for hole in dict["holes"]:
-            hole_coords=[hole["x"],hole["y"],hole["z"]]
+            hole_coords=np.array([hole["x"],hole["y"],hole["z"]])
             hole_coords_new=np.add(np.dot(rotate,hole_coords),translate)
             new_holes.append(hole_coords_new)
 
-            pizza_coords=dict["pizza"]
-            pizza_coords_new=np.add(np.dot(rotate,pizza_coords),translate)
-            new_pizza["holes"]=new_holes
-            new_pizza["pizza"]=pizza_coords_new
-            return new_pizza
+        pizza_coords=dict["pizza"]
+        pizza_coords_new=np.add(np.dot(rotate,pizza_coords),translate)
+        new_pizza["holes"]=new_holes
+        pizza_dict={
+            "x":pizza_coords_new[0],
+            "y":pizza_coords_new[1],
+            "z":pizza_coords_new[2],
+        }
+        new_pizza["pizza"]=pizza_dict
+        return new_pizza
     except:
         print("no pizza detected!")
-        return {"holes":[],"pizza":[],}
+        new_pizza={"holes":[],"pizza":{"x":0,"y":0,"z":0},}
+        return new_pizza
 
 def camera_to_robot_list(item_list): #update
     '''
@@ -105,7 +115,7 @@ def camera_to_robot_list(item_list): #update
     translate=np.array([[-265],[0],[0]]) #26.5 cenitmeters in negative x
     for item in item_list:
         out=item
-        coords=[item["x"],item["y"],item["z"]]
+        coords=np.array([item["x"],item["y"],item["z"]])
 
         out_coords=np.add(np.dot(rotate,coords),translate)
         out["x"]=out_coords[0]

@@ -5,6 +5,9 @@ for use in selecting the right toppings and holes
 import numpy as np
 
 def get_center_dist(topping1,topping2):
+    print "999999"
+    print topping1
+    print topping2
     xdiff=topping1["x"]-topping2["x"]
     ydiff=topping1["y"]-topping2["y"] #not sure if topping is a dictionary or class or what
 
@@ -63,6 +66,7 @@ def get_available_holes_toppings(toppings,pizza):
         if (hole not in holes_filled):
             holes_open.append(hole)
 
-    print("Toppings on pizza: "+toppings_on_pizza) #sanity check
+    print "Toppings on pizza: "
+    print toppings_on_pizza #sanity check
 
     return toppings_open,holes_open
