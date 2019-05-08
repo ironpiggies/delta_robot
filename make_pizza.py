@@ -73,22 +73,25 @@ def topping_and_hole_selector(toppings,pizza):
     return(good_topping,good_hole)
 
 def camera_to_robot_dict(dict):
-    rotate=np.array([[-1,0,0],[0,-1,0],[0,0,1]]) #180 degree rotation about x
-    translate=np.array([[-265],[0],[0]]) #26.5 cenitmeters in negative x
+    try:
+        rotate=np.array([[-1,0,0],[0,-1,0],[0,0,1]]) #180 degree rotation about x
+        translate=np.array([[-265],[0],[0]]) #26.5 cenitmeters in negative x
 
-    new_pizza={}
-    new_holes=[]
-    for hole in dict["holes"]:
-        hole_coords=[hole["x"],hole["y"],hole["z"]]
+        new_pizza={}
+        new_holes=[]
+        for hole in dict["holes"]:
+            hole_coords=[hole["x"],hole["y"],hole["z"]]
+            hole_coords_new=np.add(np.dot(rotate,hole_coords),translate)
+            new_holes.append(hole_coords_new)
 
-        hole_coords_new=np.add(np.dot(rotate,hole_coords),translate)
-        new_holes.append(hole_coords_new)
-
-    pizza_coords=dict["pizza"]
-    pizza_coords_new=np.add(np.dot(rotate,pizza_coords),translate)
-    new_pizza["holes"]=new_holes
-    new_pizza["pizza"]=pizza_coords_new
-    return new_pizza
+            pizza_coords=dict["pizza"]
+            pizza_coords_new=np.add(np.dot(rotate,pizza_coords),translate)
+            new_pizza["holes"]=new_holes
+            new_pizza["pizza"]=pizza_coords_new
+            return new_pizza
+    except:
+        print("no pizza detected!")
+        return {"holes":[],"pizza":[],}
 
 def camera_to_robot_list(item_list): #update
     '''
