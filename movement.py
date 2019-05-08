@@ -34,5 +34,4 @@ def pick_up_topping(current_pos,dr,ser,z_dist):
     print "back up!"
     print current_pos
     dr.moveXYZ(current_pos) #move back up
-    sleep(5)
     return

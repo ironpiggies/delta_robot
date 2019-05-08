@@ -13,7 +13,7 @@ def add_toppings(dr,ser,camera):
     '''
     topping_z_offset=100 #mm how far away from toppings we want to be moving
 
-    out_of_the_way_pos=[0,0,-700] #mm, not sure what this will be
+    out_of_the_way_pos=[0,0,-500] #mm, not sure what this will be
 
     while True:
         dr.moveXYZ(out_of_the_way_pos)
@@ -22,10 +22,11 @@ def add_toppings(dr,ser,camera):
         print "pic taken"
         print(items_dict)
         toppings,pizza=toppings_converter(items_dict)
+        #toppings=camera_to_robot()
         print toppings,pizza
         topping,hole=topping_and_hole_selector(toppings,pizza)
-        topping={"name":"pep","x":0,"y":200,"z":-700,}
-        hole={"x":200,"y":0,"z":-700,}
+        topping={"name":"pep","x":0,"y":200,"z":-500,}
+        hole={"x":200,"y":0,"z":-500,}
         if (topping and hole): #if we have a hole and topping selected
             print "starting move"
             topping_loc=[topping["x"],topping["y"],topping["z"]+topping_z_offset]
