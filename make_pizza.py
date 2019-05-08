@@ -23,8 +23,8 @@ def add_toppings(dr,ser,camera):
         print(items_dict)
         toppings,pizza=toppings_converter(items_dict)
         print toppings, pizza
-        toppings=camera_to_robot(toppings)
-        pizza=camera_to_robot(pizza)
+        toppings=camera_to_robot_list(toppings)
+        pizza=camera_to_robot_dict(pizza)
         print toppings,pizza
         topping,hole=topping_and_hole_selector(toppings,pizza)
         topping={"name":"pep","x":0,"y":200,"z":-500,}
@@ -72,17 +72,34 @@ def topping_and_hole_selector(toppings,pizza):
 
     return(good_topping,good_hole)
 
-def camera_to_robot(item_list): #update
+def camera_to_robot_dict(dict):
+    rotate=np.array([[-1,0,0],[0,-1,0],[0,0,1]]) #180 degree rotation about x
+    translate=np.array([[-265],[0],[0]]) #26.5 cenitmeters in negative x
+
+    new_pizza={}
+    new_holes=[]
+    for hole in dict["holes"]:
+        hole_coords=[hole["x"],hole["y"],hole["z"]]
+
+        hole_coords_new=np.add(np.dot(rotate,hole_coords),translate)
+        new_holes.append(hole_coords_new)
+
+    pizza_coords=dict["pizza"]
+    pizza_coords_new=np.add(np.dot(rotate,pizza_coords),translate)
+    new_pizza["holes"]=new_holes
+    new_pizza["pizza"]=pizza_coords_new
+    return new_pizza
+
+def camera_to_robot_list(item_list): #update
     '''
     takes a 3x1 position vector and outputs a position relative to the robots frame
     '''
     new_list=[]
+    rotate=np.array([[-1,0,0],[0,-1,0],[0,0,1]]) #180 degree rotation about x
+    translate=np.array([[-265],[0],[0]]) #26.5 cenitmeters in negative x
     for item in item_list:
-
         out=item
         coords=[item["x"],item["y"],item["z"]]
-        rotate=np.array([[-1,0,0],[0,-1,0],[0,0,1]]) #180 degree rotation about x
-        translate=np.array([[-265],[0],[0]]) #26.5 cenitmeters in negative x
 
         out_coords=np.add(np.dot(rotate,coords),translate)
         out["x"]=out_coords[0]
