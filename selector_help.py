@@ -34,7 +34,7 @@ def get_available_holes_toppings(toppings,pizza):
     '''
     ds=deltaSolver() #to help check
 
-    hole_radius= 40#in mm
+    hole_radius= 20#in mm
 
     pizza_offset=50#in mm
     pizza_radius=100 #distance from center of pizza
