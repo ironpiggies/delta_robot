@@ -7,6 +7,7 @@ import push_pizza
 import sys
 sys.path.append('modules/')
 import chef_vision
+import dough
 
 '''
 #three main events need to happen:
@@ -75,7 +76,7 @@ def make_dough(dr,ser,camera):
     #while !find_dough():
     #   continue
     #(x,y)=find_dough()
-    #mash()
+    dough.mash(dr,ser,camera)
 
     return
 
