@@ -386,6 +386,35 @@ class ChefVision:
 
         return pink_squares
 
+    def find_shaker_by_color(self, color_img):
+        """
+        :param color_img: color image read from RealSense
+        :return: shaker: list of (x_center, y_center, contours)
+        """
+        # HSV masking
+        lower = np.array([45, 100, 110])
+        upper = np.array([76, 255, 255])
+        hsv_image = cv.cvtColor(color_img, cv.COLOR_BGR2HSV)
+        masked_hsv = cv.inRange(hsv_image, lower, upper)
+
+        # Find connected components
+        retval, labels = cv.connectedComponents(masked_hsv)
+
+        shakers = []
+        for label in range(retval):
+            new_img = (labels == label).astype("int")
+            # size thresholding
+            if 500 < np.sum(new_img) < 3000:
+                new_img = np.array(new_img * 255, dtype=np.uint8)
+                _, thresh = cv.threshold(new_img, 127, 255, cv.THRESH_BINARY)
+                moments = cv.moments(thresh)
+                x_center = int(moments["m10"] / moments["m00"])
+                y_center = int(moments["m01"] / moments["m00"])
+                contours, _ = cv.findContours(thresh, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)
+                shakers.append([x_center, y_center, contours])
+
+        return shakers
+
     def find_toppings(self, _3d_coord=True):
         """
         :param _3d_coord: whether return toppings as 3D positions or 2D pixels w/ radius
@@ -542,6 +571,75 @@ class ChefVision:
                 "pizza_outers": pizza_outer_coords
             }
 
+    def find_shaker(self, _3d_coord):
+        """
+        :param _3d_coord: whether return shaker as 3D positions or 2D pixels w/ contour
+        :return: a list of coords as values, (if 2D, color image is also returned)
+        """
+        shaker_counter = ToppingCounter()
+
+        total_time = 1.0  # seconds
+        time_iterator = 0
+        wait_time = 100  # milliseconds
+        while True:
+            time_iterator += 1
+            frames = self.pipe.wait_for_frames()
+            # To Do: Check align
+            frames = self.align.process(frames)
+
+            # Get color image
+            color = frames.get_color_frame()
+            color_img = np.asarray(color.get_data())
+            color_img = cv.resize(color_img, (1920, 1080))
+
+            # Get depth image
+            depth = frames.get_depth_frame()
+            depth_img = np.asarray(depth.get_data())
+            depth_img = cv.resize(depth_img, (1920, 1080))
+
+            shaker_min, shaker_max = 0.3, 0.7
+
+            # Find green shaker
+            shakers = self.find_shaker_by_color(color_img)
+            shakers = self.filter_toppings_by_depth(shakers, depth_img, (shaker_min, shaker_max))
+
+            # Update and get most common
+            shaker_counter.update(shakers)
+
+            if self.dev:
+                shakers, shaker_counts = shaker_counter.most_common(1)
+
+                # Display detection
+                color_img_copy = draw_shakers(shakers, color_img)
+                color_img_copy = cv.resize(color_img_copy, (640, 360))
+                cv.imshow("shaker detection", color_img_copy)
+
+                # Update every wait_time milliseconds, and exit on ctrl-C
+                k = cv.waitKey(wait_time)
+                if k == 27:
+                    break
+
+                if wait_time * time_iterator > total_time * 1000:
+                    time_iterator = 0
+                    shaker_counter.clear()
+
+            else:
+                if wait_time * time_iterator > total_time * 1000:
+                    break
+
+        shakers, shaker_counts = shaker_counter.most_common(1)
+
+        # Get the ones that appear often enough
+        count_threshold = 0 * total_time * 1000.0 / wait_time
+        confident_shakers = self.get_confident_ones(shakers, shaker_counts, count_threshold)
+
+        if not _3d_coord:
+            return confident_shakers, color_img
+        else:
+            shaker_coords = [self.get_xyz(shaker[:2], depth_frame=depth, depth_img=depth_img) for shaker in
+                             confident_shakers]
+            return shaker_coords
+
     def find_dough(self):
         while True:
             frames = self.pipe.wait_for_frames()
@@ -566,6 +664,7 @@ class ChefVision:
                 dough_center=self.get_xyz(dough_center, depth_frame=depth, depth_img=depth_img)
                 return dough_center
 
+
 def get_average(img,xsc,ysc,xtrans,ytrans):
     if np.sum(img)!=0:
         xavg=np.sum(np.sum(img,axis=0)*(np.arange(img.shape[1])+1))/np.sum(img)
@@ -573,7 +672,6 @@ def get_average(img,xsc,ysc,xtrans,ytrans):
     else:
         return False
     return [(xavg-xtrans)*xsc,(yavg-ytrans)*ysc]
-
 
 
 def draw_toppings(toppings, color_img):
@@ -600,6 +698,13 @@ def draw_toppings(toppings, color_img):
     for (x, y, contours) in pink_squares:
         cv.drawContours(color_img_copy, contours, -1, [0, 0, 0], 4)
 
+    return color_img_copy
+
+
+def draw_shakers(shakers, color_img):
+    color_img_copy = np.copy(color_img)
+    for (x, y, contours) in shakers:
+        cv.drawContours(color_img_copy, contours, -1, [255, 255, 0], 4)
     return color_img_copy
 
 
@@ -644,7 +749,7 @@ def print_toppings_dict(toppings):
 def main():
     """ Code for testing functionalities
     """
-    USE_RECORDING = False
+    USE_RECORDING = True
     if USE_RECORDING:  # Use recording
         directory = "videos/"
         filename = directory + random.choice(os.listdir(directory))
@@ -653,8 +758,7 @@ def main():
     else:
         print("use current video")
         chef_vision = ChefVision()
-    print chef_vision.find_dough()
-    '''
+
     while True:
         toppings, color_img = chef_vision.find_toppings(_3d_coord=False)
 
@@ -668,7 +772,36 @@ def main():
         k = cv.waitKey(100)
         if k == 27:
             break
-            '''
+
+
+def test_shaker():
+    """ Code for testing shaker
+    """
+    USE_RECORDING = True
+    if USE_RECORDING:  # Use recording
+        directory = "videos/"
+        filename = directory + random.choice(os.listdir(directory))
+        print("play from file: {}".format(filename))
+        chef_vision = ChefVision(filename=filename)
+    else:
+        print("use current video")
+        chef_vision = ChefVision()
+
+    while True:
+        shakers, color_img = chef_vision.find_shaker(_3d_coord=False)
+
+        assert len(shakers) <= 1
+
+        # Display detection
+        color_img_copy = draw_shakers(shakers, color_img)
+
+        color_img_copy = cv.resize(color_img_copy, (640, 360))
+        cv.imshow("shaker detection", color_img_copy)
+
+        # Update every wait_time milliseconds, and exit on ctrl-C
+        k = cv.waitKey(100)
+        if k == 27:
+            break
 
 
 def test_continuous():
@@ -690,3 +823,4 @@ def test_continuous():
 if __name__ == "__main__":
     main()
     # test_continuous()
+    # test_shaker()
