@@ -33,8 +33,8 @@ def push(dr,ser,camera):
     camera_to_robot_pizza(pizza)
 
 
-    pizza_z=-610 #z value for moving the pizza
-    z_offset=10 #offset value for moving around
+    pizza_z=-690 #z value for moving the pizza
+    z_offset=50 #offset value for moving around
     pizza_x_1=pizza.pos[0]
     pizza_y_1=pizza.pos[1]
 
