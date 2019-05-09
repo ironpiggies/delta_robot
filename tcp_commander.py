@@ -19,9 +19,15 @@ def sendRoboCommand(msg):
 
 
 def main():
+<<<<<<< HEAD
     sendRoboCommand("wait")
     sendRoboCommand('start')
     sendRoboCommand("stop")
+=======
+    sendRoboCommand("1")
+    sendRoboCommand('2')
+    sendRoboCommand("hello world")
+>>>>>>> 121b77317bb25df2d4316143a4c827fc87c64036
 
 if __name__ == '__main__': 
 	main()

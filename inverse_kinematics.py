@@ -91,6 +91,7 @@ class deltaSolver(object):
 		#self.plot(position(xx,yy,zz))
 
 	def check_workspace(self, goal):
+<<<<<<< HEAD
 		# Goal is a position object
 		table_x_min = -620/2			# Placeholder numbers for now
 		table_x_max = 620/2
@@ -98,15 +99,27 @@ class deltaSolver(object):
 		table_y_max = 610/2
 		z_min = -750
 		z_max = 0
+=======
+		# check trapezoidal workspace
+        y_min = -320
+        y_max = 305
+        xcorners = [-160,160,-305,305]
+        ycorners = [y_min,y_min,y_max,y_max]
+		z_min = -726
+		z_max = -626
+>>>>>>> 121b77317bb25df2d4316143a4c827fc87c64036
 
 		x_valid = False
 		y_valid = False
 		z_valid = False
+        
+        interpxmin = (y_min-goal.y)/(y_min-y_max)*(xcorners[2]-xcorners[0])+xcorners[0]
+        interpxmax = (y_min-goal.y)/(y_min-y_max)*(xcorners[3]-xcorners[1])+xcorners[3]
 
-		if table_x_min <= goal.x <= table_x_max:
+		if interpxmin <= goal.x <= interpxmax:
 			x_valid = True
 
-		if table_y_min <= goal.y <= table_y_max:
+		if y_min <= goal.y <= y_max:
 			y_valid = True
 
 		if z_min <= goal.z <= z_max:
