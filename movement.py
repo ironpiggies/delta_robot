@@ -13,7 +13,7 @@ def drop_topping(current_pos,dr,ser,z_dist):
     ser.send(3) #hold after done blowing
     dr.moveXYZ_waypoints(final_pos,current_pos,1)
 
-def pick_up_topping(current_pos,dr,ser,z_dist):
+def pick_up_topping(current_pos, dr, ser, z_dist):
     '''
     moves down z_dist amount to pick up topping
     '''

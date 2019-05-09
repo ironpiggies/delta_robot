@@ -392,8 +392,8 @@ class ChefVision:
         :return: shaker: list of (x_center, y_center, contours)
         """
         # HSV masking
-        lower = np.array([45, 100, 110])
-        upper = np.array([76, 255, 255])
+        lower = np.array([40, 100, 110])
+        upper = np.array([80, 255, 255])
         hsv_image = cv.cvtColor(color_img, cv.COLOR_BGR2HSV)
         masked_hsv = cv.inRange(hsv_image, lower, upper)
 
@@ -571,7 +571,7 @@ class ChefVision:
                 "pizza_outers": pizza_outer_coords
             }
 
-    def find_shaker(self, _3d_coord):
+    def find_shaker(self, _3d_coord=True):
         """
         :param _3d_coord: whether return shaker as 3D positions or 2D pixels w/ contour
         :return: a list of coords as values, (if 2D, color image is also returned)
@@ -632,6 +632,11 @@ class ChefVision:
         # Get the ones that appear often enough
         count_threshold = 0 * total_time * 1000.0 / wait_time
         confident_shakers = self.get_confident_ones(shakers, shaker_counts, count_threshold)
+
+        # Draw image for sanity check
+        # color_img_copy = draw_shakers(confident_shakers, color_img)
+        # color_img_copy = cv.resize(color_img_copy, (640, 360))
+        # cv.imshow("shaker detection", color_img_copy)
 
         if not _3d_coord:
             return confident_shakers, color_img
@@ -777,7 +782,7 @@ def main():
 def test_shaker():
     """ Code for testing shaker
     """
-    USE_RECORDING = True
+    USE_RECORDING = False
     if USE_RECORDING:  # Use recording
         directory = "videos/"
         filename = directory + random.choice(os.listdir(directory))
@@ -821,6 +826,6 @@ def test_continuous():
 
 
 if __name__ == "__main__":
-    main()
+    # main()
     # test_continuous()
-    # test_shaker()
+    test_shaker()

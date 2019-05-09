@@ -10,6 +10,9 @@ import chef_vision
 import dough
 from tcp_commander import sendRoboCommand
 import time
+import numpy as np
+
+from movement import pick_up_topping
 
 '''
 #three main events need to happen:
@@ -70,9 +73,71 @@ def deliver_pizza(dr,ser,camera):
     time.sleep(0.5)
     print "Telling Mobile Robot that we are ready"
     sendRoboCommand('transfer')
-
-
     return
+
+
+def move_out_of_way(dr):
+    out_of_the_way_pos = [-290, 300, -550]  # mm,
+    out_way_inter = [0, 0, -500]
+    dr.moveXYZ(out_way_inter)
+    current_pos = out_way_inter
+    dr.setHighSpeed()
+    dr.moveXYZ_waypoints(current_pos, out_of_the_way_pos, 5)
+
+def camera_to_robot_frame(pos):
+    """ Convert from camera frame to robot frame
+    :param pos: a list, (x, y, z)
+    :return: a list, (x, y, z)
+    """
+    # Coordinate transformation
+    pos = np.array(pos)
+    rotate = np.array([[1, 0, 0],
+                       [0, -1, 0],
+                       [0, 0, -1]])  # 180 degree rotation about x
+    translate = np.array([190, -20, -40])  # 26.5 cenitmeters in negative x
+    pos = np.add(np.matmul(pos, rotate), translate).tolist()
+    return pos
+
+def add_pepper(dr, ser, camera):
+    move_out_of_way(dr)
+
+    # a list of coordinates
+    shakers_pos_in_camera_frame = []
+    for _ in range(10): # Try five times
+        shakers_pos_in_camera_frame = camera.find_shaker()
+        if len(shakers_pos_in_camera_frame) > 0:
+            break
+
+    if len(shakers_pos_in_camera_frame) > 0:
+        print("shaker found")
+        shaker_pos = shakers_pos_in_camera_frame[0]
+
+        shaker_pos = camera_to_robot_frame(shaker_pos)
+
+        print("shaker pos: {}".format(shaker_pos))
+        target_pos = shaker_pos
+        target_pos[2] = -500
+        reply = raw_input("confirm? y/N")
+        if reply == "y":
+            dr.moveXYZ(target_pos)
+            pick_up_topping(current_pos=target_pos, dr=dr, ser=ser, z_dist=130)
+            move_out_of_way(dr)
+            toppings = camera.find_toppings()
+            pizza = toppings["pizza_outers"]
+            if len(pizza) > 0:
+                print("pizza found")
+                pizza = pizza[0]
+                pizza = camera_to_robot_frame(pizza)
+                print("pizza position: {}".format(pizza))
+                target_pos = pizza
+                target_pos[2] = -500
+                raw_input("looks good? (if not, it's your chance to kill me")
+                dr.moveXYZ(target_pos)
+                dr.shake(target_pos)
+            else:
+                print("did not find pizza")
+    else:
+        print("Did not find shaker")
 
 
 def make_dough(dr,ser,camera):
@@ -90,10 +155,13 @@ def make_dough(dr,ser,camera):
     return
 
 
-# for i in range(10):
-#     sendRoboCommand('start')
-#     time.sleep(0.5)
-# put_toppings_on(dr,ser,camera)
-dr.shake([0, 0, -600])
-# deliver_pizza(dr,ser,camera)
-# make_dough(dr,ser,camera)
+for i in range(10):
+    sendRoboCommand('start')
+    time.sleep(0.5)
+put_toppings_on(dr,ser,camera)
+
+# Not working. Don't run it!!
+# add_pepper(dr, ser, camera)
+
+deliver_pizza(dr,ser,camera)
+make_dough(dr,ser,camera)

@@ -75,7 +75,7 @@ class deltaBot:
             x_coord = posval[0] + SHAKE_RADIUS*np.cos(theta)
             y_coord = posval[1] + SHAKE_RADIUS*np.sin(theta)
             self.moveXYZnoStop([x_coord, y_coord, posval[2]])
-            time.sleep(0.005)
+            time.sleep(0.0001)
 
     def setHighSpeed(self):
         self.motors.setHighSpeed()
