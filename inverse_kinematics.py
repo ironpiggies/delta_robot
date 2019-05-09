@@ -50,7 +50,7 @@ def rotx(theta):
 
 class deltaSolver(object):
 	# Dimensions are in mm
-	def __init__(self, sb = 219.97, sp = 51.11, L = 304.8, l = 759.57, h = 54.77, tht0 = (0, 0, 0), swivel_limit = 10*DEG2RAD):
+	def __init__(self, sb = 219.97*2, sp = 51.11, L = 304.8, l = 759.57, h = 39, tht0 = (0, 0, 0), swivel_limit = 10*DEG2RAD):
 		self.swivel_limit = swivel_limit
 		(self.currTheta1, self.currTheta2, self.currTheta3) = tht0
 		self.vel1 = 0
@@ -88,7 +88,7 @@ class deltaSolver(object):
 		self.thts = (th1, th2, th3)
 		self.fig = plt.figure()
 
-		self.plot(position(xx,yy,zz))
+		#self.plot(position(xx,yy,zz))
 
 	def check_workspace(self, goal):
 		# Goal is a position object
@@ -96,7 +96,7 @@ class deltaSolver(object):
 		table_x_max = 620/2
 		table_y_min = -610/2
 		table_y_max = 610/2
-		z_min = -1000
+		z_min = -750
 		z_max = 0
 
 		x_valid = False

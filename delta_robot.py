@@ -19,7 +19,7 @@ class deltaBot:
                 time.sleep(0.5)
             print "motors ready"
         self.kinsolver = inverse_kinematics.deltaSolver()
-        self.kinsolver.plot()
+        #self.kinsolver.plot()
 
     def moveXYZ(self, posval):
         '''
@@ -30,7 +30,7 @@ class deltaBot:
         goalpos=inverse_kinematics.position(-posval[0],posval[1],posval[2]) #negative on x position because it is flipped somehow
         try:
             cmdtheta = self.kinsolver.ik(goalpos)
-            self.kinsolver.updatePlot(goalpos)
+            #self.kinsolver.updatePlot(goalpos)
             if self.RUN_REAL:
                 return self.motors.setJointPosWait(cmdtheta)
             else:
@@ -40,11 +40,45 @@ class deltaBot:
             print(posval)
             return 0
 
+    def moveXYZnoStop(self, posval):
+        '''
+        move the robot in xyz coordinates
+        input is a list having the [x,y,z] values in millimeters
+        NOTE: z axis is negative downwards
+        '''
+        goalpos = inverse_kinematics.position(-posval[0], posval[1],
+                                                  posval[2])  # negative on x position because it is flipped somehow
+        try:
+            cmdtheta = self.kinsolver.ik(goalpos)
+            # self.kinsolver.updatePlot(goalpos)
+            if self.RUN_REAL:
+                return self.motors.setJointPos(cmdtheta)
+            else:
+                return 2
+        except:
+             print('Could not move')
+             print(posval)
+             return 0
+
     def setHighSpeed(self):
         self.motors.setHighSpeed()
 
     def setLowSpeed(self):
         self.motors.setLowSpeed()
+
+    def moveXYZ_waypoints(self, currentpos,posval, step_size=1):
+        if currentpos==posval:
+            return
+
+        from path import points_between
+        points=points_between(currentpos,posval,step_size)
+        for point in points:
+            if not self.moveXYZnoStop(point):
+                print "this one was bad"
+                print point
+
+        time.sleep(.5)
+        self.moveXYZ(posval)
 
 
 

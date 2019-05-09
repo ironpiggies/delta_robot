@@ -11,41 +11,53 @@ def add_toppings(dr,ser,camera):
     '''
     continues to add toppings
     '''
+    #sleep(10)
     topping_z_offset=100 #mm how far away from toppings we want to be moving
+    gripper_height = 60 # mm height of the gripper
+    dropping_z_offset = 75 # dropping height
 
-    out_of_the_way_pos=[-290,-275,-600] #mm,
-
+    out_of_the_way_pos=[-290,300,-550] #mm,
+    out_way_inter=[0,0,-500]
+    dr.moveXYZ(out_way_inter)
+    current_pos=out_way_inter
     while True:
-        dr.moveXYZ(out_of_the_way_pos)
+        dr.moveXYZ_waypoints(current_pos,out_of_the_way_pos,1)
+        current_pos=out_of_the_way_pos
         print "moved to out of the way" # moves robot out of way to take pic
         items_dict=camera.find_toppings() #from jays code we get a dict of all the objects
         print "pic taken"
         print(items_dict)
         print "****************!!!!!!"
-        items_dict['pizza_outers']=[0,0,-600]
-        items_dict['red_cirs']=[[-150,100,-600]]
-        items_dict['yellow_triangles']=[[-50,0,-600]]
-        items_dict['pizza_inners']=[[-100, -50,-600],[-100,-100,-600]]
-        toppings,pizza=toppings_converter(items_dict)
-
+        #items_dict['pizza_outers']=[0,0,-600]
+       # items_dict['red_cirs']=[[-150,100,-600]]
+       # items_dict['yellow_triangles']=[[-50,0,-600]]
+       # items_dict['pizza_inners']=[[-100, -50,-600],[-100,-100,-600]]
+        try:
+            toppings,pizza=toppings_converter(items_dict)
+        except:
+            print "no pizza found, trying again!"
+            continue
         camera_to_robot_list(toppings)
         camera_to_robot_pizza(pizza)
-        for topping in toppings:
-            print topping.pos
         topping,hole=topping_and_hole_selector(toppings,pizza)
         #topping=item([0,200,-500],'pep')
         #hole=item([200,0,-500],'hole')
         if (topping and hole): #if we have a hole and topping selected
-            print "starting move"
+            print "going to pickup"
+            print topping.name
+            print topping.pos
+            #sleep(5)
             topping_loc=topping.pos[::]
             hole_loc=hole.pos[::]
-            topping_loc[2]+=topping_z_offset
-            hole_loc[2]+=topping_z_offset
+            topping_loc[2]+=(topping_z_offset+gripper_height)
 
-            dr.moveXYZ(topping_loc)
+            hole_loc[2]+=(topping_z_offset + gripper_height)
+
+            dr.moveXYZ_waypoints(out_of_the_way_pos,topping_loc,1)
             pick_up_topping(topping_loc,dr,ser,topping_z_offset)
-            dr.moveXYZ(hole_loc)
-            drop_topping(hole_loc,dr,ser)
+            dr.moveXYZ_waypoints(topping_loc,hole_loc,1)
+            drop_topping(hole_loc,dr,ser, dropping_z_offset)
+            current_pos=hole_loc
         else:
             print("Ending add_toppings() because no more holes or no more toppings")
             return()
@@ -70,6 +82,7 @@ def topping_and_hole_selector(toppings,pizza):
     good_topping=False #the topping we want to pick up
     good_hole=False
     avail_toppings,avail_holes=get_available_holes_toppings(toppings,pizza)
+    #print('available toppings: ', avail_toppings)
     #for now, just select the first available topping and the first available hole
     try:
         good_topping=avail_toppings[0]
@@ -111,5 +124,5 @@ def toppings_converter(items_dict): #im lazy so instead of rewriting everything 
     for hole in items_dict['pizza_inners']:
         temp_hole=item(hole,'hole')
         hole_list.append(temp_hole)
-    pizza=pizza_item(items_dict["pizza_outers"],hole_list)
+    pizza=pizza_item(items_dict["pizza_outers"][0],hole_list)
     return topping_list,pizza

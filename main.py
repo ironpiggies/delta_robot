@@ -18,10 +18,11 @@ main.py file pretty clean, as it will allow us to debug only one function at a t
 '''
 
 #easy enough to comment one out when we don't want to run everything.
-arduino_port="/dev/ttyACM0"
+arduino_port="/dev/arduino"
+
 
 print "starting ser"
-ser=pneumatics.start_serial(arduino_port)
+ser=pneumatics.pneu_ser(arduino_port)
 print "starting camera"
 camera=chef_vision.ChefVision()
 print "starting dr"

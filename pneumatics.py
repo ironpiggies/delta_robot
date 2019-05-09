@@ -5,7 +5,41 @@ from time import sleep
 
 #'/dev/ttyACM0'
 
+class pneu_ser:
+    def __init__(self,port):
+        #self.port=port
+        #self.start()
+        try:
+            self.ser = Serial(port, 9600, timeout=5)
+        except:
+            print("could not open serial port",port)
 
+    def start(self):
+        try:
+            self.ser = Serial(self.port, 9600, timeout=5)
+            return True
+        except:
+            print("Cannot start serial connection! ", self.port)
+            return False
+
+    def send(self,cmd):
+        try:
+            str_cmd=str(cmd)+'\n'
+            self.ser.write(str_cmd)
+        except:
+            print "can't start serial connection, trying again"
+            self.try_again(cmd)
+
+    def try_again(self,cmd):
+        print "trying again to connect to arduino"
+        #result=self.start()
+        result = 1
+        if result:
+            self.send(cmd)
+        else:
+            self.try_again(cmd)
+
+'''
 def start_serial(port):
     try:
         serialComm = Serial(port, 9600, timeout = 5) #can change number to reflect the baud rate on the arduino
@@ -23,7 +57,7 @@ def send_pump_cmd(pump_cmd,serialComm):
     except:
         print("Can't send pump command")
         return False #return false if it doesnt work
-
+'''
 #below is for testing
 #ser=start_serial("/dev/cu.usbmodem1421")
 #print(ser)

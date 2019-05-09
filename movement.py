@@ -1,14 +1,17 @@
-from pneumatics import send_pump_cmd
 from time import sleep
 
-def drop_topping(current_pos,dr,ser):
+def drop_topping(current_pos,dr,ser,z_dist):
     '''
-    if the current code isnt accurate enough we can lower down first then relase the topping
     '''
-    blow_time=.25
-    send_pump_cmd(2,ser) #blow to release
+
+    final_pos = current_pos[::]
+    final_pos[2] -= z_dist  # move down by z
+    dr.moveXYZ(final_pos)
+    blow_time=.35
+    ser.send(2) #blow to release
     sleep(blow_time)
-    send_pump_cmd(3,ser) #hold after done blowing
+    ser.send(3) #hold after done blowing
+    dr.moveXYZ(current_pos)
 
 def pick_up_topping(current_pos,dr,ser,z_dist):
     '''
@@ -23,15 +26,12 @@ def pick_up_topping(current_pos,dr,ser,z_dist):
     final_pos[2]-=z_dist #move down by z
 
 
-    send_pump_cmd(2,ser) #blow first
+    ser.send(2)#blow first
     sleep(blow_time)
-    send_pump_cmd(3,ser) #hold
-    print final_pos
-    dr.moveXYZ(final_pos) #move down
-    send_pump_cmd(1,ser) #suck
+    ser.send(3) #hold
+    dr.moveXYZ_waypoints(current_pos,final_pos,1) #move down
+    ser.send(1) #suck
     sleep(suck_time)
-    send_pump_cmd(3,ser) #back to hold
-    print "back up!"
-    print current_pos
-    dr.moveXYZ(current_pos) #move back up
+    #ser.send(3) #back to hold
+    dr.moveXYZ_waypoints(final_pos,current_pos,1) #move back up
     return

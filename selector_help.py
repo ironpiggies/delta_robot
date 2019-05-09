@@ -4,7 +4,7 @@ for use in selecting the right toppings and holes
 
 import numpy as np
 from math import sqrt
-from inverse_kinematics import deltaSolver
+from inverse_kinematics import deltaSolver,position
 
 def get_center_dist(topping1,topping2):
 
@@ -34,12 +34,12 @@ def get_available_holes_toppings(toppings,pizza):
     '''
     ds=deltaSolver() #to help check
 
-    hole_radius= 10#in mm
+    hole_radius= 40#in mm
 
     pizza_offset=50#in mm
-    pizza_radius=20 #distance from center of pizza
+    pizza_radius=100 #distance from center of pizza
 
-    topping_radius=10#in mm, min distance between two toppings
+    topping_radius=30#in mm, min distance between two toppings
 
     pizza_center=pizza
 
@@ -57,7 +57,8 @@ def get_available_holes_toppings(toppings,pizza):
 
     for topping in toppings:
         if (get_center_dist(topping,pizza_center)>pizza_radius): #if topping is outside of pizza
-            if ds.check_workspace(topping.pos): #if it is in our viable workspace
+            topping_pos=position(topping.pos[0],topping.pos[1],topping.pos[2])
+            if ds.check_workspace(topping_pos): #if it is in our viable workspace
                 dist_list=get_dist_list(topping,toppings)
                 #only sees one topping then get_dist_list returns None
                 if (not dist_list or min(dist_list)>topping_radius): #if topping is far enough away from other toppings
@@ -75,4 +76,6 @@ def get_available_holes_toppings(toppings,pizza):
 
     print "Toppings on pizza: "
     print toppings_on_pizza #sanity check
+    print holes_open
+    print toppings_open
     return toppings_open,holes_open

@@ -422,7 +422,7 @@ class ChefVision:
             circular_toppings, pizza_inners, pizza_outers = self.find_circles_by_HoughCircles(color_img)
 
             # Depth filtering
-            table_min, table_max = 0.5, 0.8
+            table_min, table_max = 0.55, 0.85
             circular_toppings = self.filter_toppings_by_depth(circular_toppings, depth_img, (table_min, table_max))
             pizza_inners = self.filter_toppings_by_depth(pizza_inners, depth_img, (table_min, table_max))
             pizza_outers = self.filter_toppings_by_depth(pizza_outers, depth_img, (table_min, table_max))
@@ -639,7 +639,7 @@ def main():
 def test_continuous():
     """ Test for displaying detection results continuously - mainly for development
     """
-    USE_RECORDING = True
+    USE_RECORDING = False
     if USE_RECORDING:  # Use recording
         directory = "videos/"
         filename = directory + random.choice(os.listdir(directory))

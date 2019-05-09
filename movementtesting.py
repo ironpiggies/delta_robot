@@ -1,0 +1,30 @@
+import delta_robot
+import sys
+import time
+sys.path.append('modules/')
+
+
+dr=delta_robot.deltaBot()
+measured_pos = dr.kinsolver.FK(dr.motors.getJointPos())
+print(measured_pos)
+dr.setLowSpeed()
+dr.moveXYZ([-200, 200, -680])
+time.sleep(10)
+measured_pos = dr.kinsolver.FK(dr.motors.getJointPos())
+print(measured_pos)
+dr.moveXYZ([200, 200, -680])
+time.sleep(10)
+measured_pos = dr.kinsolver.FK(dr.motors.getJointPos())
+print(measured_pos)
+dr.moveXYZ([200, -200, -680])
+time.sleep(10)
+measured_pos = dr.kinsolver.FK(dr.motors.getJointPos())
+print(measured_pos)
+dr.moveXYZ([-200, -200, -680])
+time.sleep(10)
+measured_pos = dr.kinsolver.FK(dr.motors.getJointPos())
+print(measured_pos)
+dr.moveXYZ([0, 0, -620])
+dr.moveXYZ([0, 0, -680])
+measured_pos = dr.kinsolver.FK(dr.motors.getJointPos())
+print(measured_pos)
