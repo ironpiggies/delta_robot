@@ -1,7 +1,10 @@
-from movement import pick_up_topping
+from movement import pick_up_topping,drop_topping
 from time import sleep
 import math
 import numpy as np
+import sys
+sys.path.append('modules/')
+from chef2 import get_dough
 
 def mash(dr,ser,camera):
     '''
@@ -14,12 +17,21 @@ def mash(dr,ser,camera):
     should look in camera for play dough and masher tool.
     when it sees masher tool it should pick it up and mash the dough.
     '''
+    dough_z=-700
+
     out_of_the_way_pos=[-290,300,-550] #mm,
     dr.moveXYZ(out_of_the_way_pos)
+    camera.pipe.stop()
     while True:
-        #items_dict = camera.find_toppings()  # write new function here
+        dough_camera=get_dough()  # write new function here. is a np array
         try:
-            #convert somehow
+            dough_camera.append(-dough_z)
+
+            rotate = np.array([[1, 0, 0],
+                               [0, -1, 0],
+                               [0, 0, -1]])  # 180 degree rotation about x
+            translate = np.array([190, -20, 0])  # 26.5 cenitmeters in negative x
+            dough_out=np.add(np.matmul(np.array(dough_camera),rotate),translate) #transform coordinates to robot frame
             print 'found the stuff, gonna wait now'
             sleep(5) #so ta's can leave
             break
@@ -28,21 +40,21 @@ def mash(dr,ser,camera):
             continue
 
     z_offset=70
-    masher_z=-680
-    dough_z=-680
 
-    masher_pos=[-100,-100,masher_z]
-    masher_pos_offset=[-100,-100,masher_z+z_offset]
+    random_pos=[-290,300,dough_z]
 
-    dough_pos=[0,0,dough_z]
-    dough_pos_offset=[0,0,dough_z+z_offset]
+    dough_pos=[dough_out[0],dough_out[1],dough_z]
+    dough_pos_offset=[dough_out[0],dough_out[1],dough_z+z_offset]
+    print dough_pos
 
-    dr.moveXYZ_waypoints(out_of_the_way_pos,masher_pos_offset,1)
-    pick_up_topping(dr,ser,z_offset)
-    dr.moveXYZ_waypoints(masher_pos_offset,dough_pos_offset,1)
+    dr.moveXYZ_waypoints(out_of_the_way_pos,random_pos,1)
+    pick_up_topping(random_pos,dr,ser,z_offset-70)
+    dr.moveXYZ_waypoints(random_pos,dough_pos_offset,1)
     sleep(.1)
-    final_pos=smash(dr,dough_pos,z_offset)
+    final_pos=smash(dr,dough_pos_offset,dough_pos,z_offset)
+
     dr.moveXYZ_waypoints(final_pos,out_of_the_way_pos,1)
+    drop_topping(out_of_the_way_pos,dr,ser,0)
 
 def smash(dr,start_pos,dough_pos,z_offset):
     '''
@@ -63,7 +75,7 @@ def smash(dr,start_pos,dough_pos,z_offset):
     for angle in angles:
         x=dough_pos[0]+radius*math.cos(angle)
         y=dough_pos[1]+radius*math.sin(angle)
-        points.append[x,y,dough_pos[2]] #add all points in a circle
+        points.append([x,y,dough_pos[2]]) #add all points in a circle
 
     current_pos=start_pos[::]
     for point in points:
@@ -74,7 +86,7 @@ def smash(dr,start_pos,dough_pos,z_offset):
         sleep(0.1)
         dr.moveXYZ_waypoints(point_offset,point,1)
         sleep(0.1)
-        dr.move(point,point_offset,1)#currently at point offset)
+        dr.moveXYZ_waypoints(point,point_offset,1)#currently at point offset)
         sleep(0.1)
         current_pos=point_offset[::]
     return current_pos

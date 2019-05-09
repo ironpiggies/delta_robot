@@ -8,6 +8,8 @@ import sys
 sys.path.append('modules/')
 import chef_vision
 import dough
+from tcp_commander import sendRoboCommand
+import time
 
 '''
 #three main events need to happen:
@@ -55,14 +57,20 @@ def deliver_pizza(dr,ser,camera):
     to tell us that it is ready. then we execute command to push pizza. then tell
     mobile that we've pushed it off
     '''
+
     print("Starting to deliver pizza!")
+    while True:
+        result=sendRoboCommand('waiting')
+        if result=='ready':
+            print "got response from mobile robot"
+            break
+        time.sleep(1)
 
     push_pizza.push(dr,ser,camera)
-    #send_pizza_ready_signal() or something
-    #while !mobile_in_position():
-    #   continue
-    #push_pizza_off()
-    #send_deliver_signal()
+    time.sleep(0.5)
+    print "Telling Mobile Robot that we are ready"
+    sendRoboCommand('transfer')
+
 
     return
 
@@ -79,7 +87,9 @@ def make_dough(dr,ser,camera):
     dough.mash(dr,ser,camera)
 
     return
-
+for i in range(10):
+    sendRoboCommand('start')
+    time.sleep(0.5)
 put_toppings_on(dr,ser,camera)
-#deliver_pizza(dr,ser,camera)
-#make_dough(dr,ser,camera)
+deliver_pizza(dr,ser,camera)
+make_dough(dr,ser,camera)

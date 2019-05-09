@@ -2,7 +2,7 @@
 from toppings import item, pizza_item
 import numpy as np
 from camera_trans import toppings_converter,camera_to_robot_list,camera_to_robot_pizza
-
+import random
 from selector_help import get_dist_list, get_center_dist, get_available_holes_toppings
 from movement import drop_topping, pick_up_topping
 from time import sleep
@@ -15,14 +15,18 @@ def add_toppings(dr,ser,camera):
     #sleep(10)
     topping_z_offset=100 #mm how far away from toppings we want to be moving
     gripper_height = 60 # mm height of the gripper
-    dropping_z_offset = 75 # dropping height
+    dropping_z_offset = 100 # dropping height
 
     out_of_the_way_pos=[-290,300,-550] #mm,
     out_way_inter=[0,0,-500]
     dr.moveXYZ(out_way_inter)
     current_pos=out_way_inter
+    count=0
     while True:
-        dr.moveXYZ_waypoints(current_pos,out_of_the_way_pos,1)
+        dr.setHighSpeed()
+        dr.moveXYZ_waypoints(current_pos,out_of_the_way_pos,5)
+        if count>30:
+            break
         current_pos=out_of_the_way_pos
         print "moved to out of the way" # moves robot out of way to take pic
         items_dict=camera.find_toppings() #from jays code we get a dict of all the objects
@@ -53,16 +57,18 @@ def add_toppings(dr,ser,camera):
             topping_loc[2]+=(topping_z_offset+gripper_height)
 
             hole_loc[2]+=(topping_z_offset + gripper_height)
-
-            dr.moveXYZ_waypoints(out_of_the_way_pos,topping_loc,1)
+            dr.setHighSpeed()
+            dr.moveXYZ_waypoints(out_of_the_way_pos,topping_loc,5)
             pick_up_topping(topping_loc,dr,ser,topping_z_offset)
-            dr.moveXYZ_waypoints(topping_loc,hole_loc,1)
+            dr.setHighSpeed()
+            dr.moveXYZ_waypoints(topping_loc,hole_loc,5)
             drop_topping(hole_loc,dr,ser, dropping_z_offset)
             current_pos=hole_loc
         else:
             print("Ending add_toppings() because no more holes or no more toppings")
-            dr.moveXYZ_waypoints(current_pos,out_of_the_way_pos,1)
+            dr.moveXYZ_waypoints(current_pos,out_of_the_way_pos,5)
             return()
+        count+=1
 
 
 def add_shaker(dr,ser):
@@ -83,11 +89,15 @@ def topping_and_hole_selector(toppings,pizza):
 
     good_topping=False #the topping we want to pick up
     good_hole=False
-    avail_toppings,avail_holes=get_available_holes_toppings(toppings,pizza)
+    avail_toppings,avail_holes,randomize=get_available_holes_toppings(toppings,pizza)
     #print('available toppings: ', avail_toppings)
     #for now, just select the first available topping and the first available hole
     try:
-        good_topping=avail_toppings[0]
+        if randomize:
+            num=random.randint(0,len(avail_toppings)-1)
+            good_topping=avail_toppings[num]
+        else:
+            good_topping=avail_toppings[0]
         good_hole=avail_holes[0]
     except: #if holes are filled, avail_holes=[], if no toppings,avail_toppings=[] so this deals with that
         print("No more good toppings or holes!")

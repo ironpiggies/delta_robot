@@ -77,7 +77,7 @@ class deltaBot:
                 print "this one was bad"
                 print point
 
-        time.sleep(.5)
+        time.sleep(.1)
         self.moveXYZ(posval)
 
 

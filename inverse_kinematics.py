@@ -98,7 +98,7 @@ class deltaSolver(object):
 		y_max = 305
 		xcorners = [-160,160,-305,305]
 		ycorners = [y_min,y_min,y_max,y_max]
-		z_min = -750
+		z_min = -755
 		z_max = -500
 
 

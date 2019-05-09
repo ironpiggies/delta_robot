@@ -165,7 +165,7 @@ class ChefVision:
         else:
             pizza_inners = []
 
-        pizza_outers = cv.HoughCircles(edges, cv.HOUGH_GRADIENT, 1, 25, param1=100, param2=25, minRadius=200,
+        pizza_outers = cv.HoughCircles(edges, cv.HOUGH_GRADIENT, 1, 25, param1=100, param2=25, minRadius=180,
                                        maxRadius=215)
         if pizza_outers is not None:
             pizza_outers = np.round(pizza_outers[0, :]).astype("int").tolist()
@@ -261,7 +261,7 @@ class ChefVision:
         :return: True if red
         """
         h, s, v = pixel
-        if 0 <= h <= 10 or 160 <= h <= 180:
+        if (0 <= h <= 10 or 160 <= h <= 180) and (v >= 30):
             return True
         return False
 
@@ -542,6 +542,39 @@ class ChefVision:
                 "pizza_outers": pizza_outer_coords
             }
 
+    def find_dough(self):
+        while True:
+            frames = self.pipe.wait_for_frames()
+            frames = self.align.process(frames)
+
+            color = frames.get_color_frame()
+            color_img = np.asarray(color.get_data())
+            color_img = cv.resize(color_img, (1920, 1080))
+
+            depth = frames.get_depth_frame()
+            depth_img = np.asarray(depth.get_data())
+            depth_img = cv.resize(depth_img, (1920, 1080))
+
+            dough_upper=[180,255,255] #105,100,102
+            dough_lower=np.array([0,0,0]) #85, 43
+
+
+            dough_mask=apply_hsv_mask(color_img,dough_lower,dough_upper)
+            #print dough_mask.shape
+            dough_center=get_average(dough_mask)
+            if dough_center!=[0,0]:
+                dough_center=self.get_xyz(dough_center, depth_frame=depth, depth_img=depth_img)
+                return dough_center
+
+def get_average(img,xsc,ysc,xtrans,ytrans):
+    if np.sum(img)!=0:
+        xavg=np.sum(np.sum(img,axis=0)*(np.arange(img.shape[1])+1))/np.sum(img)
+        yavg=np.sum(np.sum(img,axis=1)*(np.arange(img.shape[0])+1))/np.sum(img)
+    else:
+        return False
+    return [(xavg-xtrans)*xsc,(yavg-ytrans)*ysc]
+
+
 
 def draw_toppings(toppings, color_img):
     red_cirs, black_rings, pizza_inners, pizza_outers = toppings["red_cirs"], toppings["black_rings"], \
@@ -620,7 +653,8 @@ def main():
     else:
         print("use current video")
         chef_vision = ChefVision()
-
+    print chef_vision.find_dough()
+    '''
     while True:
         toppings, color_img = chef_vision.find_toppings(_3d_coord=False)
 
@@ -634,6 +668,7 @@ def main():
         k = cv.waitKey(100)
         if k == 27:
             break
+            '''
 
 
 def test_continuous():

@@ -179,17 +179,17 @@ class piggydrive:
         return retval 
 
     def setHighSpeed(self):
-        self.axis0.trap_traj.config.vel_limit = 720000
-        self.axis0.trap_traj.config.accel_limit = 600000
-        self.axis0.trap_traj.config.decel_limit = 600000
+        self.axis0.trap_traj.config.vel_limit = 920000
+        self.axis0.trap_traj.config.accel_limit = 800000
+        self.axis0.trap_traj.config.decel_limit = 800000
 
-        self.axis1.trap_traj.config.vel_limit = 720000
-        self.axis1.trap_traj.config.accel_limit = 600000
-        self.axis1.trap_traj.config.decel_limit = 600000
+        self.axis1.trap_traj.config.vel_limit = 920000
+        self.axis1.trap_traj.config.accel_limit = 800000
+        self.axis1.trap_traj.config.decel_limit = 800000
 
-        self.axis2.trap_traj.config.vel_limit = 720000
-        self.axis2.trap_traj.config.accel_limit = 600000
-        self.axis2.trap_traj.config.decel_limit = 600000
+        self.axis2.trap_traj.config.vel_limit = 920000
+        self.axis2.trap_traj.config.accel_limit = 800000
+        self.axis2.trap_traj.config.decel_limit = 800000
 
 
     def setLowSpeed(self):

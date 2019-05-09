@@ -7,7 +7,6 @@ from math import sqrt
 from inverse_kinematics import deltaSolver,position
 
 def get_center_dist(topping1,topping2):
-
     pos1=topping1.pos
     pos2=topping2.pos
     xdiff=pos1[0]-pos2[0]
@@ -37,9 +36,9 @@ def get_available_holes_toppings(toppings,pizza):
     hole_radius= 20#in mm
 
     pizza_offset=50#in mm
-    pizza_radius=120 #distance from center of pizza
+    pizza_radius=110 #distance from center of pizza
 
-    topping_radius=30#in mm, min distance between two toppings
+    topping_radius=10#in mm, min distance between two toppings
 
     pizza_center=pizza
 
@@ -48,6 +47,8 @@ def get_available_holes_toppings(toppings,pizza):
 
     toppings_open=[]
     holes_open=[]
+
+    randomize=False
 
     for topping in toppings:
         for hole in pizza.holes:
@@ -69,6 +70,7 @@ def get_available_holes_toppings(toppings,pizza):
                             print("A "+topping.name+ " is available for pickup at ("+str(topping.pos[0])+","+str(topping.pos[1])+")") #prints topping name and location
                     else:
                         toppings_open.append(topping) #if all toppings are on, then all toppings are available to put on
+                        randomize=True
 
     for hole in pizza.holes: #now add holes that aren't in holed_filled
         if (hole not in holes_filled):
@@ -76,6 +78,6 @@ def get_available_holes_toppings(toppings,pizza):
 
     print "Toppings on pizza: "
     print toppings_on_pizza #sanity check
-    print holes_open
-    print toppings_open
-    return toppings_open,holes_open
+    #print holes_open
+    #print toppings_open
+    return toppings_open,holes_open,randomize

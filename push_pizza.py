@@ -32,31 +32,34 @@ def push(dr,ser,camera):
             continue
     camera_to_robot_pizza(pizza)
 
-
-    pizza_z=-690 #z value for moving the pizza
+    pizza_radius=95#mm
+    pizza_z=-670 #z value for moving the pizza
     z_offset=50 #offset value for moving around
     pizza_x_1=pizza.pos[0]
     pizza_y_1=pizza.pos[1]
 
     pizza_x_2=0
-    pizza_y_2=pizza_y_1
+    pizza_y_2=-550
 
-    pizza_x_3=0
-    pizza_y_3=300
+    pos1_prev=[pizza_x_1,pizza_y_1+pizza_radius,pizza_z+z_offset]
+    pos1=[pizza_x_1,pizza_y_1+pizza_radius,pizza_z]
+    pos2=[pizza_x_2,pizza_y_2+pizza_radius,pizza_z]
+    pos3=pos2[::]
+    pos3[2]+=z_offset
 
-    pos1_prev=[pizza_x_1,pizza_y_1,pizza_z+z_offset]
-    pos1=[pizza_x_1,pizza_y_1,pizza_z]
-    pos2=[pizza_x_2,pizza_y_2,pizza_z]
-    pos3=[pizza_x_3,pizza_y_3,pizza_z]
 
     dr.moveXYZ_waypoints(out_of_the_way_pos,pos1_prev,1)
     sleep(.1)
     ser.send(2)
-    sleep(.3) #inflate a little
+    sleep(.7)
     ser.send(3)
     dr.moveXYZ_waypoints(pos1_prev,pos1,1)
-    sleep(.1)
+    ser.send(1)
+    sleep(1.5)
     dr.moveXYZ_waypoints(pos1,pos2,1)
-    sleep(.1)
+    ser.send(2)
+    sleep(.3)
+    ser.send(3)
     dr.moveXYZ_waypoints(pos2,pos3,1)
+    dr.moveXYZ_waypoints(pos3,out_of_the_way_pos,1)
     return
