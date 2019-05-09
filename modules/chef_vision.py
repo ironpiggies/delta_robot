@@ -69,7 +69,7 @@ class CirclesCounter:
         """
         ax, ay, ar = a
         bx, by, br = b
-        tol = 5
+        tol = 10
         return abs(ax-bx) < tol and abs(ay-by) < tol and abs(ar-br) < tol
 
 
@@ -152,21 +152,21 @@ class ChefVision:
         # gray = cv.cvtColor(blur, cv.COLOR_BGR2GRAY)
         edges = cv.Canny(blur, 35, 70, apertureSize=3)
 
-        circular_toppings = cv.HoughCircles(edges, cv.HOUGH_GRADIENT, 1, 25, param1=100, param2=25, minRadius=20, maxRadius=32)
+        circular_toppings = cv.HoughCircles(edges, cv.HOUGH_GRADIENT, 1, 25, param1=100, param2=15, minRadius=17, maxRadius=25)
         if circular_toppings is not None:
             circular_toppings = np.round(circular_toppings[0, :]).astype("int").tolist()
         else:
             circular_toppings = []
 
-        pizza_inners = cv.HoughCircles(edges, cv.HOUGH_GRADIENT, 1, 25, param1=100, param2=25, minRadius=32,
-                                       maxRadius=43)
+        pizza_inners = cv.HoughCircles(edges, cv.HOUGH_GRADIENT, 1, minDist=40, param1=100, param2=20, minRadius=27,
+                                       maxRadius=55)
         if pizza_inners is not None:
             pizza_inners = np.round(pizza_inners[0, :]).astype("int").tolist()
         else:
             pizza_inners = []
 
         pizza_outers = cv.HoughCircles(edges, cv.HOUGH_GRADIENT, 1, 25, param1=100, param2=25, minRadius=180,
-                                       maxRadius=215)
+                                       maxRadius=200)
         if pizza_outers is not None:
             pizza_outers = np.round(pizza_outers[0, :]).astype("int").tolist()
         else:
@@ -317,7 +317,7 @@ class ChefVision:
         for label in range(retval):
             new_img = (labels == label).astype("int")
             # size thresholding
-            if 500 < np.sum(new_img) < 100000:
+            if 500 < np.sum(new_img) < 2000:
                 new_img = np.array(new_img*255, dtype=np.uint8)
                 _, thresh = cv.threshold(new_img, 127, 255, cv.THRESH_BINARY)
                 moments = cv.moments(thresh)
@@ -375,7 +375,7 @@ class ChefVision:
         for label in range(retval):
             new_img = (labels == label).astype("int")
             # size thresholding
-            if 1000 < np.sum(new_img) < 3000:
+            if 800 < np.sum(new_img) < 2000:
                 new_img = np.array(new_img * 255, dtype=np.uint8)
                 _, thresh = cv.threshold(new_img, 127, 255, cv.THRESH_BINARY)
                 moments = cv.moments(thresh)
@@ -486,7 +486,7 @@ class ChefVision:
             if self.dev:
                 red_cirs, red_cir_counts = red_cir_counter.most_common(5)
                 black_rings, black_ring_counts = black_ring_counter.most_common(5)
-                yellow_triangles, yellow_triangle_counts = yellow_triangle_counter.most_common(5)
+                yellow_triangles, yellow_triangle_counts = yellow_triangle_counter.most_common(4)
                 blue_fishes, blue_fish_counts = blue_fish_counter.most_common(5)
                 pink_squares, pink_square_counts = pink_square_counter.most_common(5)
                 pizza_inners, pizza_inner_counts = pizza_inner_counter.most_common(9)
@@ -527,7 +527,7 @@ class ChefVision:
 
         red_cirs, red_cir_counts = red_cir_counter.most_common(5)
         black_rings, black_ring_counts = black_ring_counter.most_common(5)
-        yellow_triangles, yellow_triangle_counts = yellow_triangle_counter.most_common(5)
+        yellow_triangles, yellow_triangle_counts = yellow_triangle_counter.most_common(4)
         blue_fishes, blue_fish_counts = blue_fish_counter.most_common(5)
         pink_squares, pink_square_counts = pink_square_counter.most_common(5)
         pizza_inners, pizza_inner_counts = pizza_inner_counter.most_common(9)
@@ -758,6 +758,7 @@ def main():
     if USE_RECORDING:  # Use recording
         directory = "videos/"
         filename = directory + random.choice(os.listdir(directory))
+        # filename = "videos/19-05-09_16_53_30.bag"
         print("play from file: {}".format(filename))
         chef_vision = ChefVision(filename=filename)
     else:
@@ -826,6 +827,6 @@ def test_continuous():
 
 
 if __name__ == "__main__":
-    # main()
+    main()
     # test_continuous()
-    test_shaker()
+    # test_shaker()

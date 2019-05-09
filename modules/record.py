@@ -22,7 +22,7 @@ class Recorder:
 
     def record(self):
         self.pipe.start(self.config)
-        time.sleep(20)
+        time.sleep(10)
         self.pipe.stop()
 
 

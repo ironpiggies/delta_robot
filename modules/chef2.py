@@ -98,8 +98,8 @@ def get_dough():
         denoised2=denoise(masked3,7,2)
 
 
-        xscale=290/(433-191) #mm per pixel
-        yscale=290/(298-39)
+        xscale=8/7.0*290/(433-191) #mm per pixel
+        yscale=290.0/(298-39)
         xtrans=320
         ytrans=240
 
