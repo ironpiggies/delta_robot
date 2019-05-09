@@ -79,6 +79,6 @@ def make_dough(dr,ser,camera):
 
     return
 
-#put_toppings_on(dr,ser,camera)
-deliver_pizza(dr,ser,camera)
-#make_dough(dr,ser)
+put_toppings_on(dr,ser,camera)
+#deliver_pizza(dr,ser,camera)
+#make_dough(dr,ser,camera)

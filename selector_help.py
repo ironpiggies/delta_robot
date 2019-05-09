@@ -37,7 +37,7 @@ def get_available_holes_toppings(toppings,pizza):
     hole_radius= 20#in mm
 
     pizza_offset=50#in mm
-    pizza_radius=100 #distance from center of pizza
+    pizza_radius=120 #distance from center of pizza
 
     topping_radius=30#in mm, min distance between two toppings
 

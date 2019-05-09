@@ -9,7 +9,7 @@ class item:
         rotate = np.array([[1, 0, 0],
                            [0, -1, 0],
                            [0, 0, -1]])  # 180 degree rotation about x
-        translate = np.array([200, -24, -40])  # 26.5 cenitmeters in negative x
+        translate = np.array([200, -20, -40])  # 26.5 cenitmeters in negative x
         arr=np.array(self.pos)
         new_arr=np.add(np.matmul(arr,rotate),translate)
         self.pos=new_arr.tolist()
