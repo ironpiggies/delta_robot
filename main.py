@@ -3,7 +3,7 @@
 import make_pizza
 import delta_robot
 import pneumatics
-
+import push_pizza
 import sys
 sys.path.append('modules/')
 import chef_vision
@@ -56,6 +56,7 @@ def deliver_pizza(dr,ser,camera):
     '''
     print("Starting to deliver pizza!")
 
+    push_pizza.push(dr,ser,camera)
     #send_pizza_ready_signal() or something
     #while !mobile_in_position():
     #   continue
@@ -78,6 +79,6 @@ def make_dough(dr,ser,camera):
 
     return
 
-put_toppings_on(dr,ser,camera)
-#deliver_pizza(dr,ser)
+#put_toppings_on(dr,ser,camera)
+deliver_pizza(dr,ser,camera)
 #make_dough(dr,ser)
