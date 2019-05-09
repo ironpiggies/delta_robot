@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # author achuwils
 
+import numpy as np
 import inverse_kinematics
 #import piggy_odrive
 import math
@@ -59,6 +60,22 @@ class deltaBot:
              print('Could not move')
              print(posval)
              return 0
+
+    def shake(self, posval):
+        SHAKE_RADIUS= 50
+        NUMCIRCLE = 8
+        RESOLUTION=math.radians(3)
+        self.moveXYZ([posval[0],posval[1],posval[2]])
+        self.setHighSpeed()
+
+        time.sleep(1)
+        print("shaking")
+        for theta in np.linspace(0, 2*np.pi*NUMCIRCLE, int((2*np.pi*NUMCIRCLE)/RESOLUTION)):
+            print("theta: {}".format(theta))
+            x_coord = posval[0] + SHAKE_RADIUS*np.cos(theta)
+            y_coord = posval[1] + SHAKE_RADIUS*np.sin(theta)
+            self.moveXYZnoStop([x_coord, y_coord, posval[2]])
+            time.sleep(0.005)
 
     def setHighSpeed(self):
         self.motors.setHighSpeed()

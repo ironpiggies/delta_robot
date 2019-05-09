@@ -1,5 +1,11 @@
 # Pycharm
 .idea
 
-# pyc
+# python cache
 *.pyc
+
+# jupyter notebook
+.ipynb_checkpoints/
+
+# large video files
+modules/videos/

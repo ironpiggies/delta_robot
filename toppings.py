@@ -14,7 +14,7 @@ class item:
         new_arr=np.add(np.matmul(arr,rotate),translate)
         self.pos=new_arr.tolist()
 
-        height=-750
+        height=-752
 
         if self.name=='hole':
             self.pos[2]=height+20

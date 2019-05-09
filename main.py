@@ -74,6 +74,7 @@ def deliver_pizza(dr,ser,camera):
 
     return
 
+
 def make_dough(dr,ser,camera):
     '''
     first we need to wait until we see the dough on the table
@@ -87,9 +88,12 @@ def make_dough(dr,ser,camera):
     dough.mash(dr,ser,camera)
 
     return
-for i in range(10):
-    sendRoboCommand('start')
-    time.sleep(0.5)
-put_toppings_on(dr,ser,camera)
-deliver_pizza(dr,ser,camera)
-make_dough(dr,ser,camera)
+
+
+# for i in range(10):
+#     sendRoboCommand('start')
+#     time.sleep(0.5)
+# put_toppings_on(dr,ser,camera)
+dr.shake([0, 0, -600])
+# deliver_pizza(dr,ser,camera)
+# make_dough(dr,ser,camera)
